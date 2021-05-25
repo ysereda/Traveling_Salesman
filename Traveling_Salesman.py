@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[22]:
+# In[291]:
 
 
 # City names alphabetically
@@ -13,7 +13,7 @@ N = len(cityNames)
 print("Number of cities: ",N)
 
 
-# In[23]:
+# In[292]:
 
 
 # Distance matrix using maps.google.com. Last included city is 'Луцк'
@@ -45,194 +45,311 @@ t = [
 #print(t)
 
 
-# In[24]:
+# In[293]:
 
 
-print("Shortest route for",N,"cities:")
-d_max=0 # current distance
-r=[0] # current shortest route
-for i in range(1,N):
-    d_max += d[i-1][i]
-    r.append(i)
-d_max += d[0][N-1]
-r.append(0)
-print("Current shortest route:",r)
-print("Current shortest distance:",d_max)
+def PR(): # print result
+    global r,d_min
+    print("Shortest route:",r)
+    print("Shortest distance:",d_min)
 
 
-# In[25]:
+# In[295]:
 
 
-print("Optimize pairs")
-d_old = d_max+1
-while d_max < d_old:
-    d_old = d_max
-    for i in range(1,N-1):
-        l1 = d[r[i-1]][r[i]] + d[r[i]][r[i+1]] + d[r[i+1]][r[i+2]]
-        l2 = d[r[i-1]][r[i+1]] + d[r[i]][r[i+1]] + d[r[i]][r[i+2]]
-        if l2 < l1:
-            # swap r[i] and r[i+1]
-            tmp = r[i]
-            r[i] = r[i+1]
-            r[i+1] = tmp
-            d_max -= l1-l2
-    if d_max < d_old:
-        print("Current shortest route:",r)
-        print("Current shortest distance:",d_max)
+def init():
+    global d_min,r
+    d_min=0 # current distance
+    r=[0] # current shortest route
+    for i in range(1,N):
+        d_min += d[i-1][i]
+        r.append(i)
+    d_min += d[0][N-1]
+    r.append(0)
+    PR()    
 
 
-# In[26]:
+# In[296]:
 
 
-# Not needed?
-print("Optimize triples")
-d_old = d_max+1
-while d_max < d_old:
-    d_old = d_max
-    for i in range(1,N-2):
-        S = r[i-1]; # starting city, fixed
-        A = r[i]; B = r[i+1]; C = r[i+2]; # next 3 cities
-        F = r[i+3]; # finishing city, fixed
-        l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-        # one swap at a time is accounted in pairs above: ABC -> ACB, BAC
-        l2 = d[S][B] + d[B][C] + d[C][A] + d[A][F] # BCA
-        if l2 < l1:
-            # swap ABC -> BCA
-            r[i] = B; r[i+1] = C; r[i+2] = A;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-        l2 = d[S][C] + d[C][A] + d[A][B] + d[B][F] # CAB
-        if l2 < l1:
-            # swap ABC -> CAB
-            r[i] = C; r[i+1] = A; r[i+2] = B;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-        l2 = d[S][C] + d[C][B] + d[B][A] + d[A][F] # CBA
-        if l2 < l1:
-            # swap ABC -> CBA
-            r[i] = C; r[i+2] = A;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-    if d_max < d_old:
-        print("Current shortest route:",r)
-        print("Current shortest distance:",d_max)
+def opt2():
+    print("Optimize pairs")
+    global d_min,r
+    d_old = d_min+1
+    while d_min < d_old:
+        d_old = d_min
+        for i in range(N-2):
+            SC = r[i]; # starting city, fixed
+            A = r[i+1]; B = r[i+2]; # next 2 cities
+            FC = r[i+3]; # finishing city, fixed
+            l1 = d[SC][A] + d[A][B] + d[B][FC] # AB
+            l2 = d[SC][B] + d[B][A] + d[A][FC] # BA
+            if l2 < l1:
+                r[i+1] = B; r[i+2] = A; # swap A and B
+                d_min -= l1-l2
+                print(A,B,'->',B,A)
+        if d_min < d_old: PR()
 
 
-# In[27]:
+# In[297]:
 
 
-# Not needed?
-print("Optimize pairs")
-d_old = d_max+1
-while d_max < d_old:
-    d_old = d_max
-    for i in range(1,N-1):
-        l1 = d[r[i-1]][r[i]] + d[r[i]][r[i+1]] + d[r[i+1]][r[i+2]]
-        l2 = d[r[i-1]][r[i+1]] + d[r[i]][r[i+1]] + d[r[i]][r[i+2]]
-        if l2 < l1:
-            # swap r[i] and r[i+1]
-            tmp = r[i]
-            r[i] = r[i+1]
-            r[i+1] = tmp
-            d_max -= l1-l2
-    if d_max < d_old:
-        print("Current shortest route:",r)
-        print("Current shortest distance:",d_max)
+def opt3():
+    print("Optimize triples")
+    global d_min,r
+    d_old = d_min+1
+    while d_min < d_old:
+        d_old = d_min
+        for i in range(N-3):
+            SC = r[i]; # starting city, fixed
+            A = r[i+1]; B = r[i+2]; C = r[i+3]; # next 3 cities
+            FC = r[i+4]; # finishing city, fixed
+            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC] # ABC
+            # one swap at a time is accounted in pairs above: ABC -> ACB, BAC
+            l2 = d[SC][B] + d[B][C] + d[C][A] + d[A][FC] # BCA
+            if l2 < l1:
+                r[i+1] = B; r[i+2] = C; r[i+3] = A; # ABC -> BCA
+                d_min -= l1-l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3];
+                l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC]
+                print(A,B,C,'->',B,C,A)
+            else:
+                l2 = d[SC][C] + d[C][A] + d[A][B] + d[B][FC] # CAB (this would be ABC again if we swapped to BCA)
+                if l2 < l1:
+                    r[i+1] = C; r[i+2] = A; r[i+3] = B; # ABC -> CAB
+                    d_min -= l1-l2
+                    A = r[i+1]; B = r[i+2]; C = r[i+3];
+                    l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC]
+                    print(A,B,C,'->',C,A,B)
+            l2 = d[SC][C] + d[C][B] + d[B][A] + d[A][FC] # CBA
+            if l2 < l1:
+                r[i+1] = C; r[i+2] = B; r[i+3] = A; # ABC -> CBA
+                d_min -= l1-l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3];
+                l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC]
+                print('Needed!')
+                print(A,B,C,'->',C,B,A)
+        if d_min < d_old: PR()
 
 
-# In[28]:
+# In[298]:
 
 
-# Not needed?
-print("Optimize triples")
-d_old = d_max+1
-while d_max < d_old:
-    d_old = d_max
-    for i in range(1,N-2):
-        S = r[i-1]; # starting city, fixed
-        A = r[i]; B = r[i+1]; C = r[i+2]; # next 3 cities
-        F = r[i+3]; # finishing city, fixed
-        l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-        # one swap at a time is accounted in pairs above: ABC -> ACB, BAC
-        l2 = d[S][B] + d[B][C] + d[C][A] + d[A][F] # BCA
-        if l2 < l1:
-            # swap ABC -> BCA
-            r[i] = B; r[i+1] = C; r[i+2] = A;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-        l2 = d[S][C] + d[C][A] + d[A][B] + d[B][F] # CAB
-        if l2 < l1:
-            # swap ABC -> CAB
-            r[i] = C; r[i+1] = A; r[i+2] = B;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-        l2 = d[S][C] + d[C][B] + d[B][A] + d[A][F] # CBA
-        if l2 < l1:
-            # swap ABC -> CBA
-            r[i] = C; r[i+2] = A;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
-    if d_max < d_old:
-        print("Current shortest route:",r)
-        print("Current shortest distance:",d_max)
+def opt4():
+    print("Optimize 4 cities (cyclically)")
+    global d_min,r
+    d_old = d_min+1
+    while d_min < d_old:
+        d_old = d_min
+        for i in range(N-4):
+            SC = r[i]; # starting city, fixed
+            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; # next 4 cities
+            FC = r[i+5]; # finishing city, fixed
+            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC] # ABCD
+            l2 = d[SC][B] + d[B][C] + d[C][D] + d[D][A] + d[A][FC] # BCDA
+            if l2 < l1:
+                print(A,B,C,D,'->',B,C,D,A)
+                r[i+1] = B; r[i+2] = C; r[i+3] = D; r[i+4] = A; # ABCD -> BCDA
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4];
+            l2 = d[SC][C] + d[C][D] + d[D][A] + d[A][B] + d[B][FC] # CDAB
+            if l2 < l1:
+                print(A,B,C,D,'->',C,D,A,B)
+                r[i+1] = C; r[i+2] = D; r[i+3] = A; r[i+4] = B; # ABCD -> CDAB
+                d_min -= l1-l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4];
+                l1 = l2
+            l2 = d[SC][D] + d[D][A] + d[A][B] + d[B][C] + d[C][FC] # DABC
+            if l2 < l1:
+                print(A,B,C,D,'->',D,A,B,C)
+                r[i+1] = D; r[i+2] = A; r[i+3] = B; r[i+4] = C; # ABCD -> DABC
+                d_min -= l1-l2
+                A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
+                l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC]
+        if d_min < d_old: PR()
 
 
-# In[29]:
+# In[299]:
 
 
-print("Optimize 4 cities")
-d_old = d_max+1
-while d_max < d_old:
-    d_old = d_max
-    for i in range(1,N-3):
-        S = r[i-1]; # starting city, fixed
-        A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3]; # next 4 cities
-        F = r[i+4]; # finishing city, fixed
-        l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
-        # only need cyclic permutations
-        l2 = d[S][B] + d[B][C] + d[C][D] + d[D][A] + d[A][F] # BCDA
-        if l2 < l1:
-            # swap ABCD -> BCDA
-            r[i] = B; r[i+1] = C; r[i+2] = D; r[i+3] = A;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
-        l2 = d[S][C] + d[C][D] + d[D][A] + d[A][B] + d[B][F] # CDAB
-        if l2 < l1:
-            # swap ABCD -> CDAB
-            r[i] = C; r[i+1] = D; r[i+2] = A; r[i+3] = B;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
-        l2 = d[S][D] + d[D][A] + d[A][B] + d[B][C] + d[C][F] # DABC
-        if l2 < l1:
-            # swap ABCD -> DABC
-            r[i] = D; r[i+1] = A; r[i+2] = B; r[i+3] = C;
-            d_max -= l1-l2
-            A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
-            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
-    if d_max < d_old:
-        print("Current shortest route:",r)
-        print("Current shortest distance:",d_max)
+def opt5():
+    print("Optimize 5 cities (cyclically)")
+    global d_min,r
+    d_old = d_min+1
+    while d_min < d_old:
+        d_old = d_min
+        for i in range(N-5):
+            SC = r[i]; # starting city, fixed
+            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5] # next 5 cities
+            FC = r[i+6]; # finishing city, fixed
+            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][FC] # ABCDE
+            l2 = d[SC][B] + d[B][C] + d[C][D] + d[D][E] + d[E][A] + d[A][FC] # BCDEA
+            if l2 < l1:
+                print(A,B,C,D,E,'->',B,C,D,E,A)
+                r[i+1] = B; r[i+2] = C; r[i+3] = D; r[i+4] = E; r[i+5] = A; # ABCDE -> BCDEA
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];
+            l2 = d[SC][C] + d[C][D] + d[D][E] + d[E][A] + d[A][B] + d[B][FC] # CDEAB
+            if l2 < l1:
+                print(A,B,C,D,E,'->',C,D,E,A,B)
+                r[i+1] = C; r[i+2] = D; r[i+3] = E; r[i+4] = A; r[i+5] = B; # ABCDE -> CDEAB
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];
+            l2 = d[SC][D] + d[D][E] + d[E][A] + d[A][B] + d[B][C] + d[C][FC] # DEABC
+            if l2 < l1:
+                print(A,B,C,D,E,'->',D,E,A,B,C)
+                r[i+1] = D; r[i+2] = E; r[i+3] = A; r[i+4] = B; r[i+5] = C; # ABCDE -> DEABC
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];           
+            l2 = d[SC][E] + d[E][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC] # EABCD
+            if l2 < l1:
+                print(A,B,C,D,E,'->',E,A,B,C,D)
+                r[i+1] = E; r[i+2] = A; r[i+3] = B; r[i+4] = C; r[i+5] = D; # ABCDE -> EABCD
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];           
+        if d_min < d_old: PR()
+
+
+# In[300]:
+
+
+def opt6():
+    print("Optimize 6 cities (cyclically)")
+    global d_min,r
+    d_old = d_min+1
+    while d_min < d_old:
+        d_old = d_min
+        for i in range(N-6):
+            SC = r[i]; # starting city, fixed
+            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; # next 6 cities
+            FC = r[i+7]; # finishing city, fixed
+            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][F] + d[F][FC] # ABCDEF
+            l2 = d[SC][B] + d[B][C] + d[C][D] + d[D][E] + d[E][F] + d[F][A] + d[A][FC] # BCDEFA
+            if l2 < l1:
+                print(A,B,C,D,E,F,'->',B,C,D,E,F,A)
+                r[i+1] = B; r[i+2] = C; r[i+3] = D; r[i+4] = E; r[i+5] = F; r[i+6] = A; # ABCDEF -> BCDEFA
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];
+            l2 = d[SC][C] + d[C][D] + d[D][E] + d[E][F] + d[F][A] + d[A][B] + d[B][FC] # CDEFAB
+            if l2 < l1:
+                print(A,B,C,D,E,F,'->',C,D,E,F,A,B)
+                r[i+1] = C; r[i+2] = D; r[i+3] = E; r[i+4] = F; r[i+5] = A; r[i+6] = B; # ABCDEF -> CDEFAB
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];
+            l2 = d[SC][D] + d[D][E] + d[E][F] + d[F][A] + d[A][B] + d[B][C] + d[C][FC] # DEFABC
+            if l2 < l1:
+                print(A,B,C,D,E,F,'->',D,E,F,A,B,C)
+                r[i+1] = D; r[i+2] = E; r[i+3] = F; r[i+4] = A; r[i+5] = B; r[i+6] = C; # ABCDEF -> DEFABC
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];           
+            l2 = d[SC][E] + d[E][F] + d[F][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC] # EFABCD
+            if l2 < l1:
+                print(A,B,C,D,E,F,'->',E,F,A,B,C,D)
+                r[i+1] = E; r[i+2] = F; r[i+3] = A; r[i+4] = B; r[i+5] = C; r[i+6] = D; # ABCDEF -> EFABCD
+                d_min -= l1-l2
+                l1 = l2
+            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];           
+            l2 = d[SC][F] + d[F][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][FC] # FABCDE
+            if l2 < l1:
+                print(A,B,C,D,E,F,'->',F,A,B,C,D,E)
+                r[i+1] = F; r[i+2] = A; r[i+3] = B; r[i+4] = C; r[i+5] = D; r[i+6] = E; # ABCDEF -> FABCDE
+                d_min -= l1-l2
+                l1 = l2
+                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];           
+        if d_min < d_old: PR()
+
+
+# In[301]:
+
+
+init()
+
+
+# In[302]:
+
+
+opt2()
+
+
+# In[303]:
+
+
+opt3()
+
+
+# In[304]:
+
+
+opt4()
+
+
+# In[305]:
+
+
+opt5()
+
+
+# In[306]:
+
+
+opt6()
+
+
+# In[307]:
+
+
+opt5()
+
+
+# In[308]:
+
+
+opt4()
+
+
+# In[309]:
+
+
+opt3()
+
+
+# In[314]:
+
+
+opt2()
+
+
+# In[315]:
+
+
+d_min
+
+
+# In[ ]:
+
+
+
 
 
 # ## Results
 
-# In[8]:
+# In[316]:
 
 
-print("Current shortest route:\nStart\tEnd\tDist")
+print("Current shortest route: ",d_min,"\nStart\tEnd\tDist")
 for i in range(len(r)-1):
     print(cityNames[r[i]],"\t",cityNames[r[i+1]],"\t",d[r[i]][r[i+1]])
 
 
-# In[30]:
+# In[317]:
 
 
 # Visualize the shortest route
@@ -270,7 +387,7 @@ def plot_tours(cityNames, r):
     #plt.scatter(0,0, marker = "o", color = 'b', label = "factory")
     plt.xlabel("X"), plt.ylabel("Y"), plt.title("Tours") #, plt.legend(loc = 1)
     plt.show()
-    
+
 plot_tours(cityNames, r)
 
 
