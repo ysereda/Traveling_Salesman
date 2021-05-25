@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[40]:
+# In[22]:
 
 
 # City names alphabetically
@@ -13,7 +13,7 @@ N = len(cityNames)
 print("Number of cities: ",N)
 
 
-# In[41]:
+# In[23]:
 
 
 # Distance matrix using maps.google.com. Last included city is 'Луцк'
@@ -45,7 +45,7 @@ t = [
 #print(t)
 
 
-# In[42]:
+# In[24]:
 
 
 print("Shortest route for",N,"cities:")
@@ -60,7 +60,7 @@ print("Current shortest route:",r)
 print("Current shortest distance:",d_max)
 
 
-# In[43]:
+# In[25]:
 
 
 print("Optimize pairs")
@@ -81,9 +81,10 @@ while d_max < d_old:
         print("Current shortest distance:",d_max)
 
 
-# In[44]:
+# In[26]:
 
 
+# Not needed?
 print("Optimize triples")
 d_old = d_max+1
 while d_max < d_old:
@@ -97,39 +98,30 @@ while d_max < d_old:
         l2 = d[S][B] + d[B][C] + d[C][A] + d[A][F] # BCA
         if l2 < l1:
             # swap ABC -> BCA
-            tmpA = r[i]
-            r[i] = r[i+1] # B..
-            tmpC = r[i+2]
-            r[i+2] = tmpA # ..A
-            r[i+1] = tmpC
+            r[i] = B; r[i+1] = C; r[i+2] = A;
             d_max -= l1-l2
             A = r[i]; B = r[i+1]; C = r[i+2];
             l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
         l2 = d[S][C] + d[C][A] + d[A][B] + d[B][F] # CAB
         if l2 < l1:
             # swap ABC -> CAB
-            tmpA = r[i]
-            r[i] = r[i+2] # C..
-            tmpB = r[i+1]
-            r[i+1] = tmpA # CA.
-            r[i+2] = tmpB # CAB
+            r[i] = C; r[i+1] = A; r[i+2] = B;
             d_max -= l1-l2
             A = r[i]; B = r[i+1]; C = r[i+2];
             l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
         l2 = d[S][C] + d[C][B] + d[B][A] + d[A][F] # CBA
         if l2 < l1:
             # swap ABC -> CBA
-            tmpA = r[i]
-            r[i] = r[i+2] # C..
-            r[i+2] = tmpA # CBA
+            r[i] = C; r[i+2] = A;
             d_max -= l1-l2
             A = r[i]; B = r[i+1]; C = r[i+2];
+            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
     if d_max < d_old:
         print("Current shortest route:",r)
         print("Current shortest distance:",d_max)
 
 
-# In[45]:
+# In[27]:
 
 
 # Not needed?
@@ -151,7 +143,7 @@ while d_max < d_old:
         print("Current shortest distance:",d_max)
 
 
-# In[46]:
+# In[28]:
 
 
 # Not needed?
@@ -168,45 +160,71 @@ while d_max < d_old:
         l2 = d[S][B] + d[B][C] + d[C][A] + d[A][F] # BCA
         if l2 < l1:
             # swap ABC -> BCA
-            tmpA = r[i]
-            r[i] = r[i+1] # B..
-            tmpC = r[i+2]
-            r[i+2] = tmpA # ..A
-            r[i+1] = tmpC
+            r[i] = B; r[i+1] = C; r[i+2] = A;
             d_max -= l1-l2
             A = r[i]; B = r[i+1]; C = r[i+2];
             l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
         l2 = d[S][C] + d[C][A] + d[A][B] + d[B][F] # CAB
         if l2 < l1:
             # swap ABC -> CAB
-            tmpA = r[i]
-            r[i] = r[i+2] # C..
-            tmpB = r[i+1]
-            r[i+1] = tmpA # CA.
-            r[i+2] = tmpB # CAB
+            r[i] = C; r[i+1] = A; r[i+2] = B;
             d_max -= l1-l2
             A = r[i]; B = r[i+1]; C = r[i+2];
             l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
         l2 = d[S][C] + d[C][B] + d[B][A] + d[A][F] # CBA
         if l2 < l1:
             # swap ABC -> CBA
-            tmpA = r[i]
-            r[i] = r[i+2] # C..
-            r[i+2] = tmpA # CBA
+            r[i] = C; r[i+2] = A;
             d_max -= l1-l2
             A = r[i]; B = r[i+1]; C = r[i+2];
+            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][F]
     if d_max < d_old:
         print("Current shortest route:",r)
         print("Current shortest distance:",d_max)
 
 
-# In[ ]:
+# In[29]:
 
 
+print("Optimize 4 cities")
+d_old = d_max+1
+while d_max < d_old:
+    d_old = d_max
+    for i in range(1,N-3):
+        S = r[i-1]; # starting city, fixed
+        A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3]; # next 4 cities
+        F = r[i+4]; # finishing city, fixed
+        l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
+        # only need cyclic permutations
+        l2 = d[S][B] + d[B][C] + d[C][D] + d[D][A] + d[A][F] # BCDA
+        if l2 < l1:
+            # swap ABCD -> BCDA
+            r[i] = B; r[i+1] = C; r[i+2] = D; r[i+3] = A;
+            d_max -= l1-l2
+            A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
+            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
+        l2 = d[S][C] + d[C][D] + d[D][A] + d[A][B] + d[B][F] # CDAB
+        if l2 < l1:
+            # swap ABCD -> CDAB
+            r[i] = C; r[i+1] = D; r[i+2] = A; r[i+3] = B;
+            d_max -= l1-l2
+            A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
+            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
+        l2 = d[S][D] + d[D][A] + d[A][B] + d[B][C] + d[C][F] # DABC
+        if l2 < l1:
+            # swap ABCD -> DABC
+            r[i] = D; r[i+1] = A; r[i+2] = B; r[i+3] = C;
+            d_max -= l1-l2
+            A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
+            l1 = d[S][A] + d[A][B] + d[B][C] + d[C][D] + d[D][F]
+    if d_max < d_old:
+        print("Current shortest route:",r)
+        print("Current shortest distance:",d_max)
 
 
+# ## Results
 
-# In[47]:
+# In[8]:
 
 
 print("Current shortest route:\nStart\tEnd\tDist")
@@ -214,10 +232,46 @@ for i in range(len(r)-1):
     print(cityNames[r[i]],"\t",cityNames[r[i+1]],"\t",d[r[i]][r[i+1]])
 
 
-# In[ ]:
+# In[30]:
 
 
+# Visualize the shortest route
+import numpy as np
+from matplotlib import pyplot as plt
+import pandas as pd
+# customer locations, geographical coordinates in degrees
+latitude = np.array([49.2347128, 48.4622135, 50.2678654, 47.8561438, 48.9117518, 50.401699, 48.5187443, 50.73977, 49.8326679])
+longitude = np.array([28.3995942, 34.8602731, 28.6036778, 35.0352701, 24.6470892, 30.2525101, 32.1456232, 25.2639651, 23.9421958])
+# convert to radians
+Pi = np.pi
+#latitude = Pi/180*latitude
+#longitude = Pi/180*longitude
+# https://en.wikipedia.org/wiki/Spherical_coordinate_system
+theta = longitude # polar angle
+phi = latitude-Pi/2 # azimuthal angle
+R = 40000/(2*Pi) # radius of Earth 
+import math
+#X = R*np.sin(theta)*np.cos(phi) # x-coordinates in km
+#Y = R*np.sin(theta)*np.sin(phi) # y-coordinates in km
+#Z = R*np.cos(theta) # z-coordinates in km
+X = 40000/360*longitude
+Y = 40000/360*latitude
 
+#,'Николаев','Одесса','Полтава','Ровно','Севастополь','Симферополь','Сумы','Тернополь','Ужгород','Харьков','Херсон','Хмельницкий','Черкассы','Чернигов','Черновцы'
+# 'Донецк','Луганск',
+
+def plot_tours(cityNames, r):
+    tours = [[r[i], r[i+1]] for i in range(N)]
+    plt.figure(1, figsize=(20,15))
+    for s, tour in enumerate(tours):
+        plt.plot([ X[tour[0]], X[tour[1]] ], [ Y[tour[0]], Y[tour[1]] ], color = "black", linewidth=0.5) # line
+        plt.scatter(X[tour[1]], Y[tour[1]], marker = 'x', color = 'g', label = cityNames[tour[1]]) # dot
+        plt.text(X[tour[1]]*1.001, Y[tour[1]]*1.001, cityNames[tour[1]], fontsize=12)
+    #plt.scatter(0,0, marker = "o", color = 'b', label = "factory")
+    plt.xlabel("X"), plt.ylabel("Y"), plt.title("Tours") #, plt.legend(loc = 1)
+    plt.show()
+    
+plot_tours(cityNames, r)
 
 
 # In[ ]:
