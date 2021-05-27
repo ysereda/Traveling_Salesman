@@ -1,58 +1,63 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[433]:
+# In[540]:
 
 
 # City names alphabetically
-cityNames = ['Винница','Днепр','Житомир','Запорожье','Ивано-Франковск','Киев','Кропивницкий','Луцк','Львов','Николаев']
-#,'Одесса','Полтава','Ровно','Севастополь','Симферополь','Сумы','Тернополь','Ужгород','Харьков','Херсон','Хмельницкий','Черкассы','Чернигов','Черновцы'
+cityNames = ['Винница','Днепр','Житомир','Запорожье','Ивано-Франковск','Киев','Кропивницкий','Луцк','Львов','Николаев','Одесса']
+#,'Полтава','Ровно','Севастополь','Симферополь','Сумы','Тернополь','Ужгород','Харьков','Херсон','Хмельницкий','Черкассы','Чернигов','Черновцы'
 # 'Донецк','Луганск',
+# Geographical coordinates in degrees
+latitude = np.array([49.2347128, 48.4622135, 50.2678654, 47.8561438, 48.9117518, 50.401699, 48.5187443, 50.73977, 49.8326679, 46.9329791,46.4598865])
+longitude = np.array([28.3995942, 34.8602731, 28.6036778, 35.0352701, 24.6470892, 30.2525101, 32.1456232, 25.2639651, 23.9421958, 31.8679134, 30.5717031])
+
 print(cityNames)
 N = len(cityNames); print("Number of cities: ",N)
 
 
-# In[445]:
+# In[541]:
 
 
 # Distance matrix using maps.google.com. Last included city is 'Луцк'
 d = [
-    [  0, 588, 128, 651, 368, 268, 322, 389, 364, 431],
-    [588,   0, 596,85.4, 962, 480, 247, 875, 957, 322],
-    [128, 596,   0, 690, 413, 140, 392, 261, 402, 507],
-    [651,85.4, 690,   0,1026, 538, 310, 952,1021, 376],
-    [368, 962, 413,1026,   0, 560, 694, 263, 132, 780],
-    [268, 480, 140, 538, 560,   0, 303, 400, 541, 481],
-    [322, 247, 392, 310, 694, 303,   0, 670, 693, 182],
-    [389, 875, 261, 952, 263, 400, 670,   0, 180, 779],
-    [364, 957, 402,1021, 132, 541, 693, 180,   0, 802],
-    [431, 322, 507, 376, 780, 481, 182, 779, 802,   0]
+    [  0, 588, 128, 651, 368, 268, 322, 389, 364, 431, 426],
+    [588,   0, 596,85.4, 962, 480, 247, 875, 957, 322, 454],
+    [128, 596,   0, 690, 413, 140, 392, 261, 402, 507, 501],
+    [651,85.4, 690,   0,1026, 538, 310, 952,1021, 376, 508],
+    [368, 962, 413,1026,   0, 560, 694, 263, 132, 780, 798],
+    [268, 480, 140, 538, 560,   0, 303, 400, 541, 481, 475],
+    [322, 247, 392, 310, 694, 303,   0, 670, 693, 182, 309],
+    [389, 875, 261, 952, 263, 400, 670,   0, 180, 779, 774],
+    [364, 957, 402,1021, 132, 541, 693, 180,   0, 802, 797],
+    [431, 322, 507, 376, 780, 481, 182, 779, 802,   0, 132],
+    [426, 454, 501, 508, 798, 475, 309, 774, 797, 132,   0]
     ]
 d = np.array(d)
 
 # Time by car
 t = [
-    [  0, 484,  99, 521, 336, 236, 266, 311, 323, 357],
-    [484,   0, 474,  82, 866, 407, 234, 706, 765, 274],
-    [ 99, 474,   0, 582, 396, 101, 352, 204, 304, 419],
-    [521,  82, 582,   0, 898, 483, 271, 784, 826, 305],
-    [336, 866, 396, 898,   0, 482, 623, 259, 124, 692],
-    [236, 407, 101, 483, 482,   0, 263, 309, 383, 377],
-    [266, 234, 352, 271, 623, 263,   0, 589, 581, 141],
-    [311, 706, 204, 784, 259, 309, 589,   0, 166, 632],
-    [323, 765, 304, 826, 124, 383, 581, 166,   0, 663],
-    [357, 274, 419, 305, 692, 377, 141, 632, 663,   0]
+    [  0, 484,  99, 521, 336, 236, 266, 311, 323, 357, 298],
+    [484,   0, 474,  82, 866, 407, 234, 706, 765, 274, 398],
+    [ 99, 474,   0, 582, 396, 101, 352, 204, 304, 419, 367],
+    [521,  82, 582,   0, 898, 483, 271, 784, 826, 305, 431],
+    [336, 866, 396, 898,   0, 482, 623, 259, 124, 692, 634],
+    [236, 407, 101, 483, 482,   0, 263, 309, 383, 377, 319],
+    [266, 234, 352, 271, 623, 263,   0, 589, 581, 141, 263],
+    [311, 706, 204, 784, 259, 309, 589,   0, 166, 632, 575],
+    [323, 765, 304, 826, 124, 383, 581, 166,   0, 663, 602],
+    [357, 274, 419, 305, 692, 377, 141, 632, 663,   0, 124],
+    [298, 398, 367, 431, 634, 319, 263, 575, 602, 124,   0]
     ]
 t = np.array(t)
 
 
-# In[452]:
+# In[542]:
 
 
 def PR(): # print result
     global r,d_min
-    print("Shortest route:",r)
-    print("Shortest distance:",d_min)
+    print("Shortest distance = ",d_min,"; route = ",r)
 def init():
     global d_min,r
     d_min=0 # current distance
@@ -63,6 +68,127 @@ def init():
     d_min += d[0][N-1]
     r.append(0)
     PR()
+def optcities(n):
+    #print("Cycle ",n," cities:")
+    global d_min,r
+    d_old = d_min+1
+    while d_min < d_old:
+        d_old = d_min
+        for i in range(N-n):
+            SC = r[i]; # starting city, fixed
+            C = np.zeros(n,dtype='int'); # cycled cities
+            for j in range(n):
+                C[j] = r[i+1+j]; # next n cities
+            FC = r[i+n+1]; # finishing city, fixed
+            #print("C[0] = ",C[0])
+            l1 = d[SC][C[0]]
+            
+            
+            for j in range(n-1):
+                l1 += d[C[j]][C[j+1]]
+            l1 += d[C[n-1]][FC];
+            for k in range(1,n):
+                D=np.roll(C, -k);
+                l2 = d[SC][D[0]]
+                for j in range(n-1):
+                    l2 += d[D[j]][D[j+1]]
+                l2 += d[D[n-1]][FC];
+                if l2 < l1:
+                    print(C,'->',D)
+                    for j in range(n):
+                        r[i+1+j] = D[j]; # C -> D
+                    d_min -= l1-l2
+                    l1 = l2
+                    C = D;
+        
+        if d_min < d_old: PR()
+        if n>2: optcities(n-1)
+
+
+# In[547]:
+
+
+init();
+for i in range(2,N):
+    optcities(i);
+
+
+# ## Results
+
+# In[544]:
+
+
+print("Current shortest route: ",d_min,"\nStart\tEnd\tDist")
+for i in range(len(r)-1):
+    print(cityNames[r[i]],"\t",cityNames[r[i+1]],"\t",d[r[i]][r[i+1]])
+
+
+# In[545]:
+
+
+# Visualize the shortest route
+import numpy as np
+from matplotlib import pyplot as plt
+import pandas as pd
+# locations, geographical coordinates in degrees
+# convert to radians
+Pi = np.pi
+#latitude = Pi/180*latitude
+#longitude = Pi/180*longitude
+# https://en.wikipedia.org/wiki/Spherical_coordinate_system
+theta = longitude # polar angle
+phi = latitude-Pi/2 # azimuthal angle
+R = 40000/(2*Pi) # radius of Earth 
+import math
+#X = R*np.sin(theta)*np.cos(phi) # x-coordinates in km
+#Y = R*np.sin(theta)*np.sin(phi) # y-coordinates in km
+#Z = R*np.cos(theta) # z-coordinates in km
+X = 40000/360*longitude
+Y = 40000/360*latitude
+
+#,'Николаев','Одесса','Полтава','Ровно','Севастополь','Симферополь','Сумы','Тернополь','Ужгород','Харьков','Херсон','Хмельницкий','Черкассы','Чернигов','Черновцы'
+# 'Донецк','Луганск',
+
+def plot_tours(cityNames, r):
+    tours = [[r[i], r[i+1]] for i in range(N)]
+    plt.figure(1, figsize=(20,15))
+    for s, tour in enumerate(tours):
+        plt.plot([ X[tour[0]], X[tour[1]] ], [ Y[tour[0]], Y[tour[1]] ], color = "black", linewidth=0.5) # line
+        plt.scatter(X[tour[1]], Y[tour[1]], marker = 'x', color = 'g', label = cityNames[tour[1]]) # dot
+        plt.text(X[tour[1]]*1.001, Y[tour[1]]*1.001, cityNames[tour[1]], fontsize=12)
+    #plt.scatter(0,0, marker = "o", color = 'b', label = "factory")
+    plt.xlabel("X"), plt.ylabel("Y"), plt.title("Tours") #, plt.legend(loc = 1)
+    plt.show()
+
+plot_tours(cityNames, r)
+
+
+# # Draft
+
+# In[ ]:
+
+
+# Distances from Google
+import requests
+import json
+#Enter your source and destination city
+originPoint = input("Please enter your origin city: ")
+destinationPoint= input("Please enter your destination city: ")
+#Place your google map API_KEY to a variable
+apiKey = 'YOUR_API_KEY'
+#Store google maps api url in a variable
+url = 'https://maps.googleapis.com/maps/api/distancematrix/json?'
+# call get method of request module and store respose object
+r = requests.get(url + 'origins = ' + originPoint + '&destinations = ' + destinationPoint + '&key = ' + apiKey)
+#Get json format result from the above response object
+res = r.json()
+#print the value of res
+print(res)
+
+
+# In[ ]:
+
+
 def opt2():
     print("Optimize pairs")
     global d_min,r
@@ -290,89 +416,4 @@ def opt7():
                 l1 = l2
                 A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];           
         if d_min < d_old: PR()
-
-
-# In[453]:
-
-
-init(); opt2(); opt3(); opt4(); opt5(); opt6(); opt7()
-
-
-# In[454]:
-
-
-opt6(); opt5(); opt4(); opt3(); opt2();
-
-
-# ## Results
-
-# In[443]:
-
-
-print("Current shortest route: ",d_min,"\nStart\tEnd\tDist")
-for i in range(len(r)-1):
-    print(cityNames[r[i]],"\t",cityNames[r[i+1]],"\t",d[r[i]][r[i+1]])
-
-
-# In[444]:
-
-
-# Visualize the shortest route
-import numpy as np
-from matplotlib import pyplot as plt
-import pandas as pd
-# customer locations, geographical coordinates in degrees
-latitude = np.array([49.2347128, 48.4622135, 50.2678654, 47.8561438, 48.9117518, 50.401699, 48.5187443, 50.73977, 49.8326679, 46.9329791])
-longitude = np.array([28.3995942, 34.8602731, 28.6036778, 35.0352701, 24.6470892, 30.2525101, 32.1456232, 25.2639651, 23.9421958, 31.8679134])
-# convert to radians
-Pi = np.pi
-#latitude = Pi/180*latitude
-#longitude = Pi/180*longitude
-# https://en.wikipedia.org/wiki/Spherical_coordinate_system
-theta = longitude # polar angle
-phi = latitude-Pi/2 # azimuthal angle
-R = 40000/(2*Pi) # radius of Earth 
-import math
-#X = R*np.sin(theta)*np.cos(phi) # x-coordinates in km
-#Y = R*np.sin(theta)*np.sin(phi) # y-coordinates in km
-#Z = R*np.cos(theta) # z-coordinates in km
-X = 40000/360*longitude
-Y = 40000/360*latitude
-
-#,'Николаев','Одесса','Полтава','Ровно','Севастополь','Симферополь','Сумы','Тернополь','Ужгород','Харьков','Херсон','Хмельницкий','Черкассы','Чернигов','Черновцы'
-# 'Донецк','Луганск',
-
-def plot_tours(cityNames, r):
-    tours = [[r[i], r[i+1]] for i in range(N)]
-    plt.figure(1, figsize=(20,15))
-    for s, tour in enumerate(tours):
-        plt.plot([ X[tour[0]], X[tour[1]] ], [ Y[tour[0]], Y[tour[1]] ], color = "black", linewidth=0.5) # line
-        plt.scatter(X[tour[1]], Y[tour[1]], marker = 'x', color = 'g', label = cityNames[tour[1]]) # dot
-        plt.text(X[tour[1]]*1.001, Y[tour[1]]*1.001, cityNames[tour[1]], fontsize=12)
-    #plt.scatter(0,0, marker = "o", color = 'b', label = "factory")
-    plt.xlabel("X"), plt.ylabel("Y"), plt.title("Tours") #, plt.legend(loc = 1)
-    plt.show()
-
-plot_tours(cityNames, r)
-
-
-# In[ ]:
-
-
-# Distances from Google
-import requests
-import json
-#Enter your source and destination city
-originPoint = input("Please enter your origin city: ")
-destinationPoint= input("Please enter your destination city: ")
-#Place your google map API_KEY to a variable
-apiKey = 'YOUR_API_KEY'
-#Store google maps api url in a variable
-url = 'https://maps.googleapis.com/maps/api/distancematrix/json?'
-# call get method of request module and store respose object
-r = requests.get(url + 'origins = ' + originPoint + '&destinations = ' + destinationPoint + '&key = ' + apiKey)
-#Get json format result from the above response object
-res = r.json()
-#print the value of res
-print(res)
 
