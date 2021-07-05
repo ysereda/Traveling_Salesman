@@ -6,7 +6,7 @@
 
 # ## Input data
 
-# In[10]:
+# In[1]:
 
 
 # City names alphabetically
@@ -22,7 +22,7 @@ print("Possible ways: ",math.factorial(N-1))
 print(cityNames)
 
 
-# In[11]:
+# In[2]:
 
 
 # Distance matrix using maps.google.com, by car.
@@ -83,7 +83,7 @@ t = np.array([
 # 4) Repeat Steps 2-3 for increasing number <i>n</i> of neighboring cities (3, 4, ..., <i>N</i>-1). Check only <i>n</i>-1 cyclic permutations.<br>
 # 5) All other rearrangements of <i>n</i> cities are addressed by rearranging from <i>n</i>-1 down to 2 cities, Steps 2-3.<br>
 
-# In[12]:
+# In[43]:
 
 
 def PR(): # print current result
@@ -106,6 +106,7 @@ def optcities(n):
     while d_min < d_old:
         d_old = d_min # current minimal distance
         for i in range(N-n): # for all possible starting positions of the city preceding the 1st of the cycled n cities
+            # Old distance:
             SC = r[i]; # preceding city, fixed
             C = np.zeros(n,dtype='int'); # cycled cities: list of n cycled cities
             for j in range(n):
@@ -117,6 +118,112 @@ def optcities(n):
             l1 += d[C[n-1]][FC]; # ... and the next final city
             for k in range(1,n):
                 D=np.roll(C, -k); # cycling n cities k times
+                # New distance:
+                l2 = d[SC][D[0]] # l2 - distance of the above route after cycling: starting at SC ...
+                for j in range(n-1):
+                    l2 += d[D[j]][D[j+1]] # ... and passing through the n cycled cities ...
+                l2 += d[D[n-1]][FC]; # ... and the next final city
+                # If the cycled arrangement offers a shorter distance:
+                if l2 < l1:
+                    print(C,'->',D) # print the successfull cycling
+                    for j in range(n):
+                        r[i+1+j] = D[j]; # apply successfull cycling C -> D
+                    d_min -= l1-l2 # update the minimal distance
+                    l1 = l2 # update the distance of (SC - n cycled cities - FC)
+                    C = D; # update the list of n cycled cities
+        
+        if d_min < d_old: PR() # print results if the distance has shortened
+        if n>2: optcities(n-1) # All other rearrangements of n cities are addressed by rearranging from n-1 down to 2 cities
+def swap2():
+    #print("Swap 2 cities:")
+    global d_min,r,c, i_opt,j_opt,dr_min
+    dr_min=0 # change in distance
+    for i in range(1,N-1):
+        dr_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
+        for j in range(i+1,N):
+            if (j <= i-2) or (i+2 <= j):
+                dr_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
+                dr_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
+                dr_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
+                dr = dr_out1+dr_out2+dr_in1+dr_in2
+                if dr < dr_min:
+                    dr_min = dr; i_opt=i; j_opt=j;
+            elif j == i-1:
+                dr_out2 = -d[r[j-1]][r[j]] # r[j] is taken out
+                dr_in = d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[i+1]] # r[i] is put in j, r[j] is put in i
+                dr = dr_out1+dr_out2+dr_in
+                if dr < dr_min:
+                    dr_min = dr; i_opt=i; j_opt=j;
+            elif j == i+1:
+                dr_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
+                dr_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
+                dr = dr_out1+dr_out2+dr_in
+                if dr < dr_min:
+                    dr_min = dr; i_opt=i; j_opt=j;
+    if dr_min<0:
+        print(str(r[i_opt])+"<->"+str(r[j_opt])+"; dr="+str(dr_min))
+        tmp = r[i_opt]; r[i_opt] = r[j_opt]; r[j_opt] = tmp; d_min = d_min+dr_min
+
+# function to get unique values
+def unique(list1):
+    unique_list = []
+    # traverse for all elements
+    for x in list1:
+        # check if exists in unique_list or not
+        if x not in unique_list:
+            unique_list.append(x)
+    return unique_list
+def ver(r):
+    global N
+    if (len(r) != N+1) or (len(unique(r)) != N):
+        print("ERROR: incorrect r!");
+    else:
+        print("Verification is successful:\nr =",r);
+    dv=0
+    for i in range(N):
+        dv += d[r[i]][r[i+1]]
+    print("Distance =",dv)
+
+
+# ## Run
+
+# In[37]:
+
+
+init();
+for i in range(2,N):
+    optcities(i);
+
+
+# In[44]:
+
+
+ver(r)
+
+
+# In[49]:
+
+
+def optcities(n):
+    #print("Rearrange ",n," cities:")
+    global d_min,r
+    d_old = d_min+1 # keep track if distance has decreased
+    while d_min < d_old:
+        d_old = d_min # current minimal distance
+        for i in range(N-n): # for all possible starting positions of the city preceding the 1st of the cycled n cities
+            # Old distance:
+            SC = r[i]; # preceding city, fixed
+            C = np.zeros(n,dtype='int'); # cycled cities: list of n cycled cities
+            for j in range(n):
+                C[j] = r[i+1+j]; # jth cycled city
+            FC = r[i+n+1]; # final city, fixed
+            l1 = d[SC][C[0]] # l1 - original distance of the route starting at SC ...
+            for j in range(n-1):
+                l1 += d[C[j]][C[j+1]] # ... and passing through the n cities ...
+            l1 += d[C[n-1]][FC]; # ... and the next final city
+            for k in range(1,n):
+                D=np.roll(C, -k); # cycling n cities k times
+                # New distance:
                 l2 = d[SC][D[0]] # l2 - distance of the above route after cycling: starting at SC ...
                 for j in range(n-1):
                     l2 += d[D[j]][D[j+1]] # ... and passing through the n cycled cities ...
@@ -128,14 +235,26 @@ def optcities(n):
                     d_min -= l1-l2 # update the minimal distance
                     l1 = l2 # update the distance of (SC - n cycled cities - FC)
                     C = D; # update the list of n cycled cities
-        
+                D=np.flip(C,0)
+                # New distance:
+                l2 = d[SC][D[0]] # l2 - distance of the above route after cycling: starting at SC ...
+                for j in range(n-1):
+                    l2 += d[D[j]][D[j+1]] # ... and passing through the n cycled cities ...
+                l2 += d[D[n-1]][FC]; # ... and the next final city
+                if l2 < l1: # if the reversed arrangement offers a shorter distance
+                    #print(C,'->',D) # print the successfull cycling
+                    for j in range(n):
+                        r[i+1+j] = D[j]; # apply successfull cycling C -> D
+                    d_min -= l1-l2 # update the minimal distance
+                    l1 = l2 # update the distance of (SC - n cycled cities - FC)
+                    ###C = D; # update the list of n cycled cities
+                    #PR() # print results if the distance has shortened
+                    updated = True
         if d_min < d_old: PR() # print results if the distance has shortened
         if n>2: optcities(n-1) # All other rearrangements of n cities are addressed by rearranging from n-1 down to 2 cities
 
 
-# ## Run
-
-# In[13]:
+# In[50]:
 
 
 init();
@@ -143,9 +262,49 @@ for i in range(2,N):
     optcities(i);
 
 
+# In[51]:
+
+
+ver(r) #Verification of no repeated cities
+
+
+# In[46]:
+
+
+swap2()
+
+
+# ## Swap only
+
+# In[57]:
+
+
+init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
+
+
+# In[59]:
+
+
+for ii in range(30):
+    swap2()
+    #ver(r)
+    if dr_min==0: break
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); dr.append(dr_min)
+print("Distances =",dm)
+
+
+# In[65]:
+
+
+import matplotlib.pyplot as plt
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+
+
 # ## Results
 
-# In[14]:
+# In[30]:
 
 
 print("Current shortest route: ",d_min,"\nStart\tEnd\tDist")
@@ -153,7 +312,7 @@ for i in range(len(r)-1):
     print(cityNames[r[i]],"\t",cityNames[r[i+1]],"\t",d[r[i]][r[i+1]])
 
 
-# In[15]:
+# In[31]:
 
 
 # Visualize the shortest route
@@ -191,6 +350,35 @@ def plot_tours(cityNames, r):
     plt.show()
 
 plot_tours(cityNames, r)
+
+
+# ## Nearest-neighbour path
+# The rule that one first should go from the starting point to the closest point, then to the point closest to this, etc., in general does not yield the shortest route.
+
+# In[32]:
+
+
+# determine nearest-neighbor route
+nnr=[0] # current part of nearest-neighbor route: a list of city numbers along it
+nnc=[cityNames[0]] # current list of nearest-neighbor cities
+nnd=0 # current distance
+for i in range(N-1):
+    min = 1e15
+    from_city = nnr[i]
+    for j in range(1,N):
+        if (j not in nnr) and d[from_city][j] < min:
+            closest_index = j
+            min = d[from_city][j]
+    nnr.append(closest_index)
+    nnc.append(cityNames[closest_index])
+    nnd += d[from_city][closest_index]
+nnr.append(0)
+nnc.append(cityNames[0])
+nnd += d[closest_index][0]
+print("Nearest-neighbor route:")
+print(nnr)
+print(nnc)
+print("Nearest-neighbor distance =",nnd)
 
 
 # # Draft
