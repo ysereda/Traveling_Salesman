@@ -179,31 +179,6 @@ def swap2best():
     if dr_min<0:
         print(str(r[i_opt])+"<->"+str(r[j_opt])+"; dc="+str(dr_min))
         tmp = r[i_opt]; r[i_opt] = r[j_opt]; r[j_opt] = tmp; d_min = d_min+dr_min
-def swap2first():
-    #print("Swap 2 cities, apply the first working result")
-    global d_min,r,c, i_opt,j_opt,dr
-    for i in range(1,N-1):
-        dr_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
-        for j in range(i+1,N):
-            if (j <= i-2) or (i+2 <= j):
-                dr_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
-                dr_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
-                dr_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
-                dr = dr_out1+dr_out2+dr_in1+dr_in2
-            elif j == i-1:
-                dr_out2 = -d[r[j-1]][r[j]] # r[j] is taken out
-                dr_in = d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[i+1]] # r[i] is put in j, r[j] is put in i
-                dr = dr_out1+dr_out2+dr_in
-            elif j == i+1:
-                dr_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
-                dr_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
-                dr = dr_out1+dr_out2+dr_in
-            if dr < 0:
-                d_min = d_min + dr; i_opt=i; j_opt=j;
-                tmp = r[i]; r[i] = r[j]; r[j] = tmp;
-                print(str(r[i])+"<->"+str(r[j])+"; dr="+str(dr))
-                return True
-    if dr == 0: return False
 
 # function to get unique values
 def unique(list1):
@@ -295,7 +270,7 @@ def optcities(n):
         if n>2: optcities(n-1) # All other rearrangements of n cities are addressed by rearranging from n-1 down to 2 cities
 
 
-# In[ ]:
+# In[60]:
 
 
 init_prev();
@@ -695,6 +670,36 @@ def opt7():
 
 # ## Swap 2 first
 
+# In[ ]:
+
+
+def swap2first():
+    #print("Swap 2 cities, apply the first working result")
+    global d_min,r,c, i_opt,j_opt,dr
+    for i in range(1,N-1):
+        dr_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
+        for j in range(i+1,N):
+            if (j <= i-2) or (i+2 <= j):
+                dr_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
+                dr_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
+                dr_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
+                dr = dr_out1+dr_out2+dr_in1+dr_in2
+            elif j == i-1:
+                dr_out2 = -d[r[j-1]][r[j]] # r[j] is taken out
+                dr_in = d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[i+1]] # r[i] is put in j, r[j] is put in i
+                dr = dr_out1+dr_out2+dr_in
+            elif j == i+1:
+                dr_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
+                dr_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
+                dr = dr_out1+dr_out2+dr_in
+            if dr < 0:
+                d_min = d_min + dr; i_opt=i; j_opt=j;
+                tmp = r[i]; r[i] = r[j]; r[j] = tmp;
+                print(str(r[i])+"<->"+str(r[j])+"; dr="+str(dr))
+                return True
+    if dr == 0: return False
+
+
 # In[58]:
 
 
@@ -708,7 +713,7 @@ plt.figure(1, figsize=(10,10))
 plt.plot(dm)
 
 
-# In[59]:
+# In[66]:
 
 
 d_swap2first = [12713.0, 11648.4, 11558.4, 11274.0, 11177.0, 10530.0, 10324.6, 10285.6, 9901.6, 9849.0, 9789.6, 9560.6, 9545.6, 9539.6, 9183.6, 8842.6, 8822.6, 8590.6, 8575.6, 8494.6, 8231.0, 8097.0, 7996.0, 7638.0, 7449.1, 7448.0, 7372.7, 7229.099999999999, 7216.099999999999, 6999.099999999999, 6930.099999999999, 6848.099999999999, 6816.099999999999, 6780.099999999999, 6757.099999999999, 6741.099999999999, 6610.099999999999, 6562.099999999999, 6509.099999999999, 6438.099999999999, 6429.099999999999, 6147.099999999999, 6131.099999999999, 6061.099999999999, 6042.099999999999, 6004.099999999999]
@@ -718,7 +723,16 @@ plt.figure(1, figsize=(10,10))
 plt.title('Swap 2 cities: best vs first', loc='left')
 plt.plot(d_swap2first, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=5)
 plt.plot(d_swap2best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(np.array([3986.1]*len(d_swap2first)), color='red', linestyle='dotted', linewidth=1)
+plt.plot(ypoints, color = 'r')
 plt.xlabel("swaps")
 plt.ylabel("distance")
+plt.ylim([3900, 12800])
 plt.show()
+
+
+# In[ ]:
+
+
+
 
