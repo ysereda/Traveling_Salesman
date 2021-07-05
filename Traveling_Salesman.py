@@ -9,9 +9,15 @@
 # In[1]:
 
 
+import numpy as np # for fast arithmetics
+import matplotlib.pyplot as plt
+
+
+# In[2]:
+
+
 # City names alphabetically
 cityNames = ['Винница','Днепр','Житомир','Запорожье','Ивано-Франковск','Киев','Кропивницкий','Луцк','Львов','Николаев','Одесса','Полтава','Ровно','Сумы','Тернополь','Ужгород','Харьков','Херсон','Хмельницкий','Черкассы','Чернигов','Черновцы']
-import numpy as np # for fast arithmetics
 # Geographical coordinates in degrees (for visualization)
 latitude = np.array([49.2347128, 48.4622135, 50.2678654, 47.8561438, 48.9117518, 50.401699, 48.5187443, 50.73977, 49.8326679, 46.9329791,46.4598865,49.6021346,50.6199879,50.9077873,49.5483334,48.6208922,49.9934789,46.6353956,49.4229619,49.4444119,51.4981791,48.2920574])
 longitude = np.array([28.3995942, 34.8602731, 28.6036778, 35.0352701, 24.6470892, 30.2525101, 32.1456232, 25.2639651, 23.9421958, 31.8679134, 30.5717031,34.4871983,26.1815768,34.7280598,25.5276293,22.2178427,36.1603433,32.5468272,26.9170934,31.9897273,31.2193102,25.8657969])
@@ -22,7 +28,7 @@ print("Possible ways: ",math.factorial(N-1))
 print(cityNames)
 
 
-# In[2]:
+# In[3]:
 
 
 # Distance matrix using maps.google.com, by car.
@@ -83,12 +89,12 @@ t = np.array([
 # 4) Repeat Steps 2-3 for increasing number <i>n</i> of neighboring cities (3, 4, ..., <i>N</i>-1). Check only <i>n</i>-1 cyclic permutations.<br>
 # 5) All other rearrangements of <i>n</i> cities are addressed by rearranging from <i>n</i>-1 down to 2 cities, Steps 2-3.<br>
 
-# In[43]:
+# In[28]:
 
 
 def PR(): # print current result
     global r,d_min
-    print("distance = ",d_min,"; route = ",r)
+    print("d =",d_min,"; r =",r)
 def init():
     global d_min,r
     d_min=0 # current minimal distance
@@ -99,6 +105,16 @@ def init():
     d_min += d[0][N-1]
     r.append(0) # The last item in the list is the same as the 1st element
     PR()
+def init_prev():
+    global d_min,r
+    d_min=0 # current minimal distance
+    # r - current shortest route: a list of city numbers along the currently shortest route, Distance = 3986.1
+    r = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+    for i in range(1,N):
+        d_min += d[r[i-1]][r[i]]
+    d_min += d[0][r[N-1]]
+    PR()
+
 def optcities(n):
     #print("Rearrange ",n," cities:")
     global d_min,r
@@ -134,8 +150,8 @@ def optcities(n):
         
         if d_min < d_old: PR() # print results if the distance has shortened
         if n>2: optcities(n-1) # All other rearrangements of n cities are addressed by rearranging from n-1 down to 2 cities
-def swap2():
-    #print("Swap 2 cities:")
+def swap2best():
+    #print("Swap 2 cities, apply only the best result")
     global d_min,r,c, i_opt,j_opt,dr_min
     dr_min=0 # change in distance
     for i in range(1,N-1):
@@ -161,8 +177,33 @@ def swap2():
                 if dr < dr_min:
                     dr_min = dr; i_opt=i; j_opt=j;
     if dr_min<0:
-        print(str(r[i_opt])+"<->"+str(r[j_opt])+"; dr="+str(dr_min))
+        print(str(r[i_opt])+"<->"+str(r[j_opt])+"; dc="+str(dr_min))
         tmp = r[i_opt]; r[i_opt] = r[j_opt]; r[j_opt] = tmp; d_min = d_min+dr_min
+def swap2first():
+    #print("Swap 2 cities, apply the first working result")
+    global d_min,r,c, i_opt,j_opt,dr
+    for i in range(1,N-1):
+        dr_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
+        for j in range(i+1,N):
+            if (j <= i-2) or (i+2 <= j):
+                dr_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
+                dr_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
+                dr_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
+                dr = dr_out1+dr_out2+dr_in1+dr_in2
+            elif j == i-1:
+                dr_out2 = -d[r[j-1]][r[j]] # r[j] is taken out
+                dr_in = d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[i+1]] # r[i] is put in j, r[j] is put in i
+                dr = dr_out1+dr_out2+dr_in
+            elif j == i+1:
+                dr_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
+                dr_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
+                dr = dr_out1+dr_out2+dr_in
+            if dr < 0:
+                d_min = d_min + dr; i_opt=i; j_opt=j;
+                tmp = r[i]; r[i] = r[j]; r[j] = tmp;
+                print(str(r[i])+"<->"+str(r[j])+"; dr="+str(dr))
+                return True
+    if dr == 0: return False
 
 # function to get unique values
 def unique(list1):
@@ -187,7 +228,7 @@ def ver(r):
 
 # ## Run
 
-# In[37]:
+# In[ ]:
 
 
 init();
@@ -195,13 +236,13 @@ for i in range(2,N):
     optcities(i);
 
 
-# In[44]:
+# In[ ]:
 
 
 ver(r)
 
 
-# In[49]:
+# In[ ]:
 
 
 def optcities(n):
@@ -229,7 +270,7 @@ def optcities(n):
                     l2 += d[D[j]][D[j+1]] # ... and passing through the n cycled cities ...
                 l2 += d[D[n-1]][FC]; # ... and the next final city
                 if l2 < l1: # if the cycled arrangement offers a shorter distance
-                    print(C,'->',D) # print the successfull cycling
+                    #print(C,'->',D) # print the successfull cycling
                     for j in range(n):
                         r[i+1+j] = D[j]; # apply successfull cycling C -> D
                     d_min -= l1-l2 # update the minimal distance
@@ -254,47 +295,36 @@ def optcities(n):
         if n>2: optcities(n-1) # All other rearrangements of n cities are addressed by rearranging from n-1 down to 2 cities
 
 
-# In[50]:
+# In[ ]:
 
 
-init();
+init_prev();
 for i in range(2,N):
     optcities(i);
 
 
-# In[51]:
+# In[ ]:
 
 
 ver(r) #Verification of no repeated cities
 
 
+# ## Swap 2 best only
+
 # In[46]:
 
 
-swap2()
-
-
-# ## Swap only
-
-# In[57]:
-
-
 init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
-
-
-# In[59]:
-
-
 for ii in range(30):
-    swap2()
-    #ver(r)
+    swap2best()
     if dr_min==0: break
     dm.append(d_min)
     i.append(i_opt); j.append(j_opt); dr.append(dr_min)
 print("Distances =",dm)
+ver(r)
 
 
-# In[65]:
+# In[47]:
 
 
 import matplotlib.pyplot as plt
@@ -302,9 +332,36 @@ plt.figure(1, figsize=(10,10))
 plt.plot(dm)
 
 
+# ## Swap 2 first
+
+# In[36]:
+
+
+init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
+while swap2first():
+    dm.append(d_min)
+    #i.append(i_opt); j.append(j_opt); dr.append(dr)
+print("Distances =",dm)
+ver(r)
+
+
+# In[37]:
+
+
+import matplotlib.pyplot as plt
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+
+
+# In[38]:
+
+
+ver(r)
+
+
 # ## Results
 
-# In[30]:
+# In[ ]:
 
 
 print("Current shortest route: ",d_min,"\nStart\tEnd\tDist")
@@ -312,7 +369,7 @@ for i in range(len(r)-1):
     print(cityNames[r[i]],"\t",cityNames[r[i+1]],"\t",d[r[i]][r[i+1]])
 
 
-# In[31]:
+# In[ ]:
 
 
 # Visualize the shortest route
@@ -355,7 +412,7 @@ plot_tours(cityNames, r)
 # ## Nearest-neighbour path
 # The rule that one first should go from the starting point to the closest point, then to the point closest to this, etc., in general does not yield the shortest route.
 
-# In[32]:
+# In[ ]:
 
 
 # determine nearest-neighbor route
@@ -634,4 +691,34 @@ def opt7():
                 l1 = l2
                 A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];           
         if d_min < d_old: PR()
+
+
+# ## Swap 2 first
+
+# In[58]:
+
+
+init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
+while swap2first():
+    dm.append(d_min)
+    #i.append(i_opt); j.append(j_opt); dr.append(dr)
+print("Distances =",dm)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+
+
+# In[59]:
+
+
+d_swap2first = [12713.0, 11648.4, 11558.4, 11274.0, 11177.0, 10530.0, 10324.6, 10285.6, 9901.6, 9849.0, 9789.6, 9560.6, 9545.6, 9539.6, 9183.6, 8842.6, 8822.6, 8590.6, 8575.6, 8494.6, 8231.0, 8097.0, 7996.0, 7638.0, 7449.1, 7448.0, 7372.7, 7229.099999999999, 7216.099999999999, 6999.099999999999, 6930.099999999999, 6848.099999999999, 6816.099999999999, 6780.099999999999, 6757.099999999999, 6741.099999999999, 6610.099999999999, 6562.099999999999, 6509.099999999999, 6438.099999999999, 6429.099999999999, 6147.099999999999, 6131.099999999999, 6061.099999999999, 6042.099999999999, 6004.099999999999]
+d_swap2best = [12713.0, 10830.0, 9493.0, 8615.0, 7916.0, 6833.0, 6098.0, 5514.4, 5332.0, 5077.0, 4947.0, 4831.1, 4609.1, 4585.1, 4577.1]
+
+plt.figure(1, figsize=(10,10))
+plt.title('Swap 2 cities: best vs first', loc='left')
+plt.plot(d_swap2first, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=5)
+plt.plot(d_swap2best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=5)
+plt.xlabel("swaps")
+plt.ylabel("distance")
+plt.show()
 
