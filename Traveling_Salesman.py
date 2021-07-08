@@ -6,14 +6,14 @@
 
 # ## Input data
 
-# In[1]:
+# In[53]:
 
 
 import numpy as np # for fast arithmetics
 import matplotlib.pyplot as plt
 
 
-# In[2]:
+# In[54]:
 
 
 # City names alphabetically
@@ -28,7 +28,7 @@ print("Possible ways: ",math.factorial(N-1))
 print(cityNames)
 
 
-# In[3]:
+# In[55]:
 
 
 # Distance matrix using maps.google.com, by car.
@@ -89,7 +89,7 @@ t = np.array([
 # 4) Repeat Steps 2-3 for increasing number <i>n</i> of neighboring cities (3, 4, ..., <i>N</i>-1). Check only <i>n</i>-1 cyclic permutations.<br>
 # 5) All other rearrangements of <i>n</i> cities are addressed by rearranging from <i>n</i>-1 down to 2 cities, Steps 2-3.<br>
 
-# In[28]:
+# In[129]:
 
 
 def PR(): # print current result
@@ -150,35 +150,232 @@ def optcities(n):
         
         if d_min < d_old: PR() # print results if the distance has shortened
         if n>2: optcities(n-1) # All other rearrangements of n cities are addressed by rearranging from n-1 down to 2 cities
+
+def nn(): # determine nearest-neighbor route
+    global d, d_nn, r_nn # distance and route
+    r_nn=[0] # current part of nearest-neighbor route: a list of city numbers along it
+    nnc=[cityNames[0]] # current list of nearest-neighbor cities
+    d_nn=0 # current distance
+    for i in range(N-1):
+        dmin = 1e15
+        from_city = r_nn[i]
+        for j in range(1,N):
+            if (j not in r_nn) and d[from_city][j] < dmin:
+                closest_index = j
+                dmin = d[from_city][j]
+        r_nn.append(closest_index)
+        nnc.append(cityNames[closest_index])
+        d_nn += d[from_city][closest_index]
+    r_nn.append(0)
+    nnc.append(cityNames[0])
+    d_nn += d[closest_index][0]
+    print("Nearest-neighbor route:")
+    print(r_nn)
+    #print(nnc)
+    print("Nearest-neighbor distance =",d_nn)
+
+def swap2first():
+    #print("Swap 2 cities, apply the first working result")
+    global d_min,r, i_opt,j_opt,dc_min
+    for i in range(1,N-1):
+        dc_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
+        for j in range(i+1,N):
+            if i+2 <= j:
+                dc_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
+                dc_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
+                dc_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
+                dc = dc_out1+dc_out2+dc_in1+dc_in2
+            elif j == i+1:
+                dc_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
+                dc_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
+                dc = dc_out1+dc_out2+dc_in
+            if dc < 0:
+                d_min = d_min + dc; i_opt=i; j_opt=j;
+                tmp = r[i]; r[i] = r[j]; r[j] = tmp;
+                print(str(r[i])+"<->"+str(r[j])+"; dc="+str(dc)+"; d = "+str(d_min))
+                dc_min=dc
+                return True
+    return False
 def swap2best():
     #print("Swap 2 cities, apply only the best result")
-    global d_min,r,c, i_opt,j_opt,dr_min
-    dr_min=0 # change in distance
+    global d_min,r, i_opt,j_opt,dc_min
+    dc_min=0 # change in distance
     for i in range(1,N-1):
-        dr_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
+        dc_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
         for j in range(i+1,N):
             if (j <= i-2) or (i+2 <= j):
-                dr_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
-                dr_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
-                dr_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
-                dr = dr_out1+dr_out2+dr_in1+dr_in2
-                if dr < dr_min:
-                    dr_min = dr; i_opt=i; j_opt=j;
+                dc_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
+                dc_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
+                dc_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
+                dc = dc_out1+dc_out2+dc_in1+dc_in2
+                if dc < dc_min:
+                    dc_min = dc; i_opt=i; j_opt=j;
             elif j == i-1:
-                dr_out2 = -d[r[j-1]][r[j]] # r[j] is taken out
-                dr_in = d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[i+1]] # r[i] is put in j, r[j] is put in i
-                dr = dr_out1+dr_out2+dr_in
-                if dr < dr_min:
-                    dr_min = dr; i_opt=i; j_opt=j;
+                dc_out2 = -d[r[j-1]][r[j]] # r[j] is taken out
+                dc_in = d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[i+1]] # r[i] is put in j, r[j] is put in i
+                dc = dc_out1+dc_out2+dc_in
+                if dc < dc_min:
+                    dc_min = dc; i_opt=i; j_opt=j;
             elif j == i+1:
-                dr_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
-                dr_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
-                dr = dr_out1+dr_out2+dr_in
-                if dr < dr_min:
-                    dr_min = dr; i_opt=i; j_opt=j;
-    if dr_min<0:
-        print(str(r[i_opt])+"<->"+str(r[j_opt])+"; dc="+str(dr_min))
-        tmp = r[i_opt]; r[i_opt] = r[j_opt]; r[j_opt] = tmp; d_min = d_min+dr_min
+                dc_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
+                dc_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
+                dc = dc_out1+dc_out2+dc_in
+                if dc < dc_min:
+                    dc_min = dc; i_opt=i; j_opt=j;
+    if dc_min<0:
+        print(str(r[i_opt])+"<->"+str(r[j_opt])+"; dc="+str(dc_min)+"; d = "+str(d_min))
+        tmp = r[i_opt]; r[i_opt] = r[j_opt]; r[j_opt] = tmp; d_min = d_min+dc_min
+        return True
+    else: return False
+
+def swap3first():
+    #print("Swap 3 cities, apply only the best result")
+    global d_min,r, i_opt,j_opt,k_opt,dc_min
+    dc_min=0 # change in distance
+    for i in range(1,N-2):
+        dc_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
+        j = i+1
+        dc_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
+        k = j+1
+        dc_out3 = -d[r[k]][r[k+1]] # r[k] is taken out
+        # ijk => kij
+        dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[k+1]] # kij
+        dc = dc_out1+dc_out2+dc_out3+dc_in
+        if dc < dc_min:
+            dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1; break; #which permutation
+        # ijk => jki
+        dc_in = d[r[i-1]][r[j]] + d[r[j]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[k+1]] # jki
+        dc = dc_out1+dc_out2+dc_out3+dc_in
+        if dc < dc_min:
+            dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2; break;
+        # j=i+1, k >= j+2:
+        for k in range(j+2,N):
+            dc_out3 = -d[r[k-1]][r[k]] - d[r[k]][r[k+1]] # r[k] is taken out
+            # ij_k => ki_j
+            dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[j+1]] + d[r[k-1]][r[j]] + d[r[j]][r[k+1]] # ki_j
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1; break;
+            # ij_k => jk_i
+            dc_in = d[r[i-1]][r[j]] + d[r[j]][r[k]] + d[r[k]][r[j+1]] + d[r[k-1]][r[i]] + d[r[i]][r[k+1]] # jk_i
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2; break;
+            # j >= i+2:
+        if dc < dc_min: break;
+        for j in range(i+2,N-1):
+            dc_out2 = -d[r[j-1]][r[j]]-d[r[j]][r[j+1]] # r[j] is taken out
+            k = j+1
+            dc_out3 = -d[r[k]][r[k+1]] # r[k] is taken out
+            # i_jk => k_ij
+            dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i+1]] + d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[k+1]] # k_ij
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1; break;
+            # i_jk => j_ki
+            dc_in = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] + d[r[j-1]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[k+1]] # j_ki
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2; break;
+            # k >= j+2:
+            for k in range(j+2,N):
+                dc_out3 = -d[r[k-1]][r[k]]-d[r[k]][r[k+1]] # r[k] is taken out
+                # i_j_k => k_i_j
+                dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i+1]] + d[r[j-1]][r[i]] + d[r[i]][r[j+1]] + d[r[k-1]][r[j]] + d[r[j]][r[k+1]] # k_i_j
+                dc = dc_out1+dc_out2+dc_out3+dc_in
+                if dc < dc_min:
+                    dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1; break;
+                # i_j_k => j_k_i
+                dc_in = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] + d[r[j-1]][r[k]] + d[r[k]][r[j+1]] + d[r[k-1]][r[i]] + d[r[i]][r[k+1]] # j_k_i
+                dc = dc_out1+dc_out2+dc_out3+dc_in
+                if dc < dc_min:
+                    dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2; break;
+            if dc < dc_min: break;
+        if dc < dc_min: break;
+    if dc_min<0:
+        if v==1: # kij
+            d_min = d_min+dc_min
+            print(str(r[i_opt])+","+str(r[j_opt])+","+str(r[k_opt])+"<->"+str(r[k_opt])+","+str(r[i_opt])+","+str(r[j_opt])+"; dc="+str(dc_min)+"; d = "+str(d_min)) #kij
+            tmp = r[i_opt]; r[i_opt] = r[k_opt]; r[k_opt] = r[j_opt]; r[j_opt] = tmp; 
+        else: # jki
+            d_min = d_min+dc_min
+            print(str(r[i_opt])+","+str(r[j_opt])+","+str(r[k_opt])+"<->"+str(r[j_opt])+","+str(r[k_opt])+","+str(r[i_opt])+"; dc="+str(dc_min)+"; d = "+str(d_min)) #jki
+            tmp = r[i_opt]; r[i_opt] = r[j_opt]; r[j_opt] = r[k_opt]; r[k_opt] = tmp;
+        return True
+    else: return False
+
+def swap3best():
+    #print("Swap 3 cities, apply only the best result")
+    global d_min,r, i_opt,j_opt,k_opt,dc_min
+    dc_min=0 # change in distance
+    for i in range(1,N-2):
+        dc_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
+        j = i+1
+        dc_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
+        k = j+1
+        dc_out3 = -d[r[k]][r[k+1]] # r[k] is taken out
+        # ijk => kij
+        dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[k+1]] # kij
+        dc = dc_out1+dc_out2+dc_out3+dc_in
+        if dc < dc_min:
+            dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1; #which permutation
+        # ijk => jki
+        dc_in = d[r[i-1]][r[j]] + d[r[j]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[k+1]] # jki
+        dc = dc_out1+dc_out2+dc_out3+dc_in
+        if dc < dc_min:
+            dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2;
+        # j=i+1, k >= j+2:
+        for k in range(j+2,N):
+            dc_out3 = -d[r[k-1]][r[k]] - d[r[k]][r[k+1]] # r[k] is taken out
+            # ij_k => ki_j
+            dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[j+1]] + d[r[k-1]][r[j]] + d[r[j]][r[k+1]] # ki_j
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1;
+            # ij_k => jk_i
+            dc_in = d[r[i-1]][r[j]] + d[r[j]][r[k]] + d[r[k]][r[j+1]] + d[r[k-1]][r[i]] + d[r[i]][r[k+1]] # jk_i
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2;
+            # j >= i+2:
+        for j in range(i+2,N-1):
+            dc_out2 = -d[r[j-1]][r[j]]-d[r[j]][r[j+1]] # r[j] is taken out
+            k = j+1
+            dc_out3 = -d[r[k]][r[k+1]] # r[k] is taken out
+            # i_jk => k_ij
+            dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i+1]] + d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[k+1]] # k_ij
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1;
+            # i_jk => j_ki
+            dc_in = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] + d[r[j-1]][r[k]] + d[r[k]][r[i]] + d[r[i]][r[k+1]] # j_ki
+            dc = dc_out1+dc_out2+dc_out3+dc_in
+            if dc < dc_min:
+                dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2;
+            # k >= j+2:
+            for k in range(j+2,N):
+                dc_out3 = -d[r[k-1]][r[k]]-d[r[k]][r[k+1]] # r[k] is taken out
+                # i_j_k => k_i_j
+                dc_in = d[r[i-1]][r[k]] + d[r[k]][r[i+1]] + d[r[j-1]][r[i]] + d[r[i]][r[j+1]] + d[r[k-1]][r[j]] + d[r[j]][r[k+1]] # k_i_j
+                dc = dc_out1+dc_out2+dc_out3+dc_in
+                if dc < dc_min:
+                    dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=1;
+                # i_j_k => j_k_i
+                dc_in = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] + d[r[j-1]][r[k]] + d[r[k]][r[j+1]] + d[r[k-1]][r[i]] + d[r[i]][r[k+1]] # j_k_i
+                dc = dc_out1+dc_out2+dc_out3+dc_in
+                if dc < dc_min:
+                    dc_min = dc; i_opt=i; j_opt=j; k_opt=k; v=2;
+    if dc_min<0:
+        if v==1: # kij
+            d_min = d_min+dc_min
+            print(str(r[i_opt])+","+str(r[j_opt])+","+str(r[k_opt])+"<->"+str(r[k_opt])+","+str(r[i_opt])+","+str(r[j_opt])+"; dc="+str(dc_min)+"; d = "+str(d_min)) #kij
+            tmp = r[i_opt]; r[i_opt] = r[k_opt]; r[k_opt] = r[j_opt]; r[j_opt] = tmp; 
+        else: # jki
+            d_min = d_min+dc_min
+            print(str(r[i_opt])+","+str(r[j_opt])+","+str(r[k_opt])+"<->"+str(r[j_opt])+","+str(r[k_opt])+","+str(r[i_opt])+"; dc="+str(dc_min)+"; d = "+str(d_min)) #jki
+            tmp = r[i_opt]; r[i_opt] = r[j_opt]; r[j_opt] = r[k_opt]; r[k_opt] = tmp;
+        return True
+    else: return False
 
 # function to get unique values
 def unique(list1):
@@ -189,88 +386,30 @@ def unique(list1):
         if x not in unique_list:
             unique_list.append(x)
     return unique_list
-def ver(r):
+def ver(rv):
     global N
-    if (len(r) != N+1) or (len(unique(r)) != N):
+    if (len(rv) != N+1) or (len(unique(rv)) != N):
         print("ERROR: incorrect r!");
     else:
-        print("Verification is successful:\nr =",r);
-    dv=0
-    for i in range(N):
-        dv += d[r[i]][r[i+1]]
-    print("Distance =",dv)
+        print("Verification is successful:\nr =",rv);
+        dv=0
+        for i in range(N):
+            dv += d[rv[i]][rv[i+1]]
+        print("Distance =",dv)
 
 
 # ## Run
 
-# In[ ]:
+# In[60]:
 
 
 init();
 for i in range(2,N):
     optcities(i);
+ver(r) #Verification of no repeated cities
 
 
-# In[ ]:
-
-
-ver(r)
-
-
-# In[ ]:
-
-
-def optcities(n):
-    #print("Rearrange ",n," cities:")
-    global d_min,r
-    d_old = d_min+1 # keep track if distance has decreased
-    while d_min < d_old:
-        d_old = d_min # current minimal distance
-        for i in range(N-n): # for all possible starting positions of the city preceding the 1st of the cycled n cities
-            # Old distance:
-            SC = r[i]; # preceding city, fixed
-            C = np.zeros(n,dtype='int'); # cycled cities: list of n cycled cities
-            for j in range(n):
-                C[j] = r[i+1+j]; # jth cycled city
-            FC = r[i+n+1]; # final city, fixed
-            l1 = d[SC][C[0]] # l1 - original distance of the route starting at SC ...
-            for j in range(n-1):
-                l1 += d[C[j]][C[j+1]] # ... and passing through the n cities ...
-            l1 += d[C[n-1]][FC]; # ... and the next final city
-            for k in range(1,n):
-                D=np.roll(C, -k); # cycling n cities k times
-                # New distance:
-                l2 = d[SC][D[0]] # l2 - distance of the above route after cycling: starting at SC ...
-                for j in range(n-1):
-                    l2 += d[D[j]][D[j+1]] # ... and passing through the n cycled cities ...
-                l2 += d[D[n-1]][FC]; # ... and the next final city
-                if l2 < l1: # if the cycled arrangement offers a shorter distance
-                    #print(C,'->',D) # print the successfull cycling
-                    for j in range(n):
-                        r[i+1+j] = D[j]; # apply successfull cycling C -> D
-                    d_min -= l1-l2 # update the minimal distance
-                    l1 = l2 # update the distance of (SC - n cycled cities - FC)
-                    C = D; # update the list of n cycled cities
-                D=np.flip(C,0)
-                # New distance:
-                l2 = d[SC][D[0]] # l2 - distance of the above route after cycling: starting at SC ...
-                for j in range(n-1):
-                    l2 += d[D[j]][D[j+1]] # ... and passing through the n cycled cities ...
-                l2 += d[D[n-1]][FC]; # ... and the next final city
-                if l2 < l1: # if the reversed arrangement offers a shorter distance
-                    #print(C,'->',D) # print the successfull cycling
-                    for j in range(n):
-                        r[i+1+j] = D[j]; # apply successfull cycling C -> D
-                    d_min -= l1-l2 # update the minimal distance
-                    l1 = l2 # update the distance of (SC - n cycled cities - FC)
-                    ###C = D; # update the list of n cycled cities
-                    #PR() # print results if the distance has shortened
-                    updated = True
-        if d_min < d_old: PR() # print results if the distance has shortened
-        if n>2: optcities(n-1) # All other rearrangements of n cities are addressed by rearranging from n-1 down to 2 cities
-
-
-# In[60]:
+# In[61]:
 
 
 init_prev();
@@ -278,65 +417,29 @@ for i in range(2,N):
     optcities(i);
 
 
-# In[ ]:
-
-
-ver(r) #Verification of no repeated cities
-
-
-# ## Swap 2 best only
-
-# In[46]:
-
-
-init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
-for ii in range(30):
-    swap2best()
-    if dr_min==0: break
-    dm.append(d_min)
-    i.append(i_opt); j.append(j_opt); dr.append(dr_min)
-print("Distances =",dm)
-ver(r)
-
-
-# In[47]:
-
-
-import matplotlib.pyplot as plt
-plt.figure(1, figsize=(10,10))
-plt.plot(dm)
-
-
-# ## Swap 2 first
-
-# In[36]:
-
-
-init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
-while swap2first():
-    dm.append(d_min)
-    #i.append(i_opt); j.append(j_opt); dr.append(dr)
-print("Distances =",dm)
-ver(r)
-
-
-# In[37]:
-
-
-import matplotlib.pyplot as plt
-plt.figure(1, figsize=(10,10))
-plt.plot(dm)
-
-
-# In[38]:
+# In[28]:
 
 
 ver(r)
+
+
+# In[62]:
+
+
+d_opt = 3986.1;
+r_opt = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+ver(r_opt)
+
+
+# In[63]:
+
+
+d_minimal = d_opt
 
 
 # ## Results
 
-# In[ ]:
+# In[64]:
 
 
 print("Current shortest route: ",d_min,"\nStart\tEnd\tDist")
@@ -344,12 +447,10 @@ for i in range(len(r)-1):
     print(cityNames[r[i]],"\t",cityNames[r[i+1]],"\t",d[r[i]][r[i+1]])
 
 
-# In[ ]:
+# In[65]:
 
 
 # Visualize the shortest route
-import numpy as np
-from matplotlib import pyplot as plt
 import pandas as pd
 # locations, geographical coordinates in degrees
 # convert to radians
@@ -384,355 +485,180 @@ def plot_tours(cityNames, r):
 plot_tours(cityNames, r)
 
 
-# ## Nearest-neighbour path
+# ### Nearest-neighbour path
 # The rule that one first should go from the starting point to the closest point, then to the point closest to this, etc., in general does not yield the shortest route.
 
-# In[ ]:
+# In[111]:
 
 
-# determine nearest-neighbor route
-nnr=[0] # current part of nearest-neighbor route: a list of city numbers along it
-nnc=[cityNames[0]] # current list of nearest-neighbor cities
-nnd=0 # current distance
-for i in range(N-1):
-    min = 1e15
-    from_city = nnr[i]
-    for j in range(1,N):
-        if (j not in nnr) and d[from_city][j] < min:
-            closest_index = j
-            min = d[from_city][j]
-    nnr.append(closest_index)
-    nnc.append(cityNames[closest_index])
-    nnd += d[from_city][closest_index]
-nnr.append(0)
-nnc.append(cityNames[0])
-nnd += d[closest_index][0]
-print("Nearest-neighbor route:")
-print(nnr)
-print(nnc)
-print("Nearest-neighbor distance =",nnd)
+nn()
 
 
-# # Draft
+# ### swap2first
 
-# In[ ]:
-
-
-# Distances from Google
-import requests
-import json
-#Enter your source and destination city
-originPoint = input("Please enter your origin city: ")
-destinationPoint= input("Please enter your destination city: ")
-#Place your google map API_KEY to a variable
-apiKey = 'YOUR_API_KEY'
-#Store google maps api url in a variable
-url = 'https://maps.googleapis.com/maps/api/distancematrix/json?'
-# call get method of request module and store respose object
-r = requests.get(url + 'origins = ' + originPoint + '&destinations = ' + destinationPoint + '&key = ' + apiKey)
-#Get json format result from the above response object
-res = r.json()
-#print the value of res
-print(res)
-
-
-# In[ ]:
-
-
-def opt2():
-    print("Optimize pairs")
-    global d_min,r
-    d_old = d_min+1
-    while d_min < d_old:
-        d_old = d_min
-        for i in range(N-2):
-            SC = r[i]; # starting city, fixed
-            A = r[i+1]; B = r[i+2]; # next 2 cities
-            FC = r[i+3]; # finishing city, fixed
-            l1 = d[SC][A] + d[A][B] + d[B][FC] # AB
-            l2 = d[SC][B] + d[B][A] + d[A][FC] # BA
-            if l2 < l1:
-                r[i+1] = B; r[i+2] = A; # swap A and B
-                d_min -= l1-l2
-                print(A,B,'->',B,A)
-        if d_min < d_old: PR()
-def opt3():
-    print("Cycle 3 cities")
-    global d_min,r
-    d_old = d_min+1
-    while d_min < d_old:
-        d_old = d_min
-        for i in range(N-3):
-            SC = r[i]; # starting city, fixed
-            A = r[i+1]; B = r[i+2]; C = r[i+3]; # next 3 cities
-            FC = r[i+4]; # finishing city, fixed
-            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC] # ABC
-            # one swap at a time is accounted in pairs above: ABC -> ACB, BAC
-            l2 = d[SC][B] + d[B][C] + d[C][A] + d[A][FC] # BCA
-            if l2 < l1:
-                r[i+1] = B; r[i+2] = C; r[i+3] = A; # ABC -> BCA
-                d_min -= l1-l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3];
-                l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC]
-                print(A,B,C,'->',B,C,A)
-            else:
-                l2 = d[SC][C] + d[C][A] + d[A][B] + d[B][FC] # CAB (this would be ABC again if we swapped to BCA)
-                if l2 < l1:
-                    r[i+1] = C; r[i+2] = A; r[i+3] = B; # ABC -> CAB
-                    d_min -= l1-l2
-                    A = r[i+1]; B = r[i+2]; C = r[i+3];
-                    l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC]
-                    print(A,B,C,'->',C,A,B)
-            l2 = d[SC][C] + d[C][B] + d[B][A] + d[A][FC] # CBA
-            if l2 < l1:
-                r[i+1] = C; r[i+2] = B; r[i+3] = A; # ABC -> CBA
-                d_min -= l1-l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3];
-                l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][FC]
-                print('Needed!')
-                print(A,B,C,'->',C,B,A)
-        if d_min < d_old: PR()
-def opt4():
-    print("Cycle 4 cities")
-    global d_min,r
-    d_old = d_min+1
-    while d_min < d_old:
-        d_old = d_min
-        for i in range(N-4):
-            SC = r[i]; # starting city, fixed
-            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; # next 4 cities
-            FC = r[i+5]; # finishing city, fixed
-            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC] # ABCD
-            l2 = d[SC][B] + d[B][C] + d[C][D] + d[D][A] + d[A][FC] # BCDA
-            if l2 < l1:
-                print(A,B,C,D,'->',B,C,D,A)
-                r[i+1] = B; r[i+2] = C; r[i+3] = D; r[i+4] = A; # ABCD -> BCDA
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4];
-            l2 = d[SC][C] + d[C][D] + d[D][A] + d[A][B] + d[B][FC] # CDAB
-            if l2 < l1:
-                print(A,B,C,D,'->',C,D,A,B)
-                r[i+1] = C; r[i+2] = D; r[i+3] = A; r[i+4] = B; # ABCD -> CDAB
-                d_min -= l1-l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4];
-                l1 = l2
-            l2 = d[SC][D] + d[D][A] + d[A][B] + d[B][C] + d[C][FC] # DABC
-            if l2 < l1:
-                print(A,B,C,D,'->',D,A,B,C)
-                r[i+1] = D; r[i+2] = A; r[i+3] = B; r[i+4] = C; # ABCD -> DABC
-                d_min -= l1-l2
-                A = r[i]; B = r[i+1]; C = r[i+2]; D = r[i+3];
-                l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC]
-        if d_min < d_old: PR()
-def opt5():
-    print("Cycle 5 cities")
-    global d_min,r
-    d_old = d_min+1
-    while d_min < d_old:
-        d_old = d_min
-        for i in range(N-5):
-            SC = r[i]; # starting city, fixed
-            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5] # next 5 cities
-            FC = r[i+6]; # finishing city, fixed
-            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][FC] # ABCDE
-            l2 = d[SC][B] + d[B][C] + d[C][D] + d[D][E] + d[E][A] + d[A][FC] # BCDEA
-            if l2 < l1:
-                print(A,B,C,D,E,'->',B,C,D,E,A)
-                r[i+1] = B; r[i+2] = C; r[i+3] = D; r[i+4] = E; r[i+5] = A; # ABCDE -> BCDEA
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];
-            l2 = d[SC][C] + d[C][D] + d[D][E] + d[E][A] + d[A][B] + d[B][FC] # CDEAB
-            if l2 < l1:
-                print(A,B,C,D,E,'->',C,D,E,A,B)
-                r[i+1] = C; r[i+2] = D; r[i+3] = E; r[i+4] = A; r[i+5] = B; # ABCDE -> CDEAB
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];
-            l2 = d[SC][D] + d[D][E] + d[E][A] + d[A][B] + d[B][C] + d[C][FC] # DEABC
-            if l2 < l1:
-                print(A,B,C,D,E,'->',D,E,A,B,C)
-                r[i+1] = D; r[i+2] = E; r[i+3] = A; r[i+4] = B; r[i+5] = C; # ABCDE -> DEABC
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];           
-            l2 = d[SC][E] + d[E][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC] # EABCD
-            if l2 < l1:
-                print(A,B,C,D,E,'->',E,A,B,C,D)
-                r[i+1] = E; r[i+2] = A; r[i+3] = B; r[i+4] = C; r[i+5] = D; # ABCDE -> EABCD
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5];           
-        if d_min < d_old: PR()
-def opt6():
-    print("Cycle 6 cities")
-    global d_min,r
-    d_old = d_min+1
-    while d_min < d_old:
-        d_old = d_min
-        for i in range(N-6):
-            SC = r[i]; # starting city, fixed
-            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; # next 6 cities
-            FC = r[i+7]; # finishing city, fixed
-            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][F] + d[F][FC] # ABCDEF
-            l2 = d[SC][B] + d[B][C] + d[C][D] + d[D][E] + d[E][F] + d[F][A] + d[A][FC] # BCDEFA
-            if l2 < l1:
-                print(A,B,C,D,E,F,'->',B,C,D,E,F,A)
-                r[i+1] = B; r[i+2] = C; r[i+3] = D; r[i+4] = E; r[i+5] = F; r[i+6] = A; # ABCDEF -> BCDEFA
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];
-            l2 = d[SC][C] + d[C][D] + d[D][E] + d[E][F] + d[F][A] + d[A][B] + d[B][FC] # CDEFAB
-            if l2 < l1:
-                print(A,B,C,D,E,F,'->',C,D,E,F,A,B)
-                r[i+1] = C; r[i+2] = D; r[i+3] = E; r[i+4] = F; r[i+5] = A; r[i+6] = B; # ABCDEF -> CDEFAB
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];
-            l2 = d[SC][D] + d[D][E] + d[E][F] + d[F][A] + d[A][B] + d[B][C] + d[C][FC] # DEFABC
-            if l2 < l1:
-                print(A,B,C,D,E,F,'->',D,E,F,A,B,C)
-                r[i+1] = D; r[i+2] = E; r[i+3] = F; r[i+4] = A; r[i+5] = B; r[i+6] = C; # ABCDEF -> DEFABC
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];           
-            l2 = d[SC][E] + d[E][F] + d[F][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC] # EFABCD
-            if l2 < l1:
-                print(A,B,C,D,E,F,'->',E,F,A,B,C,D)
-                r[i+1] = E; r[i+2] = F; r[i+3] = A; r[i+4] = B; r[i+5] = C; r[i+6] = D; # ABCDEF -> EFABCD
-                d_min -= l1-l2
-                l1 = l2
-            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];           
-            l2 = d[SC][F] + d[F][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][FC] # FABCDE
-            if l2 < l1:
-                print(A,B,C,D,E,F,'->',F,A,B,C,D,E)
-                r[i+1] = F; r[i+2] = A; r[i+3] = B; r[i+4] = C; r[i+5] = D; r[i+6] = E; # ABCDEF -> FABCDE
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6];           
-        if d_min < d_old: PR()
-def opt7():
-    print("Cycle 7 cities")
-    global d_min,r
-    d_old = d_min+1
-    while d_min < d_old:
-        d_old = d_min
-        for i in range(N-7):
-            SC = r[i]; # starting city, fixed
-            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7]; # next 7 cities
-            FC = r[i+8]; # finishing city, fixed
-            l1 = d[SC][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][F] + d[F][G] + d[G][FC] # ABCDEFG
-            l2 = d[SC][B] + d[B][C] + d[C][D] + d[D][E] + d[E][F] + d[F][G] + d[G][A] + d[A][FC] # BCDEFGA
-            if l2 < l1:
-                print(A,B,C,D,E,F,G,'->',B,C,D,E,F,G,A)
-                r[i+1] = B; r[i+2] = C; r[i+3] = D; r[i+4] = E; r[i+5] = F; r[i+6] = G; r[i+7] = A; # ABCDEFG -> BCDEFGA
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];
-            l2 = d[SC][C] + d[C][D] + d[D][E] + d[E][F] + d[F][G] + d[G][A] + d[A][B] + d[B][FC] # CDEFGAB
-            if l2 < l1:
-                print(A,B,C,D,E,F,G,'->',C,D,E,F,G,A,B)
-                r[i+1] = C; r[i+2] = D; r[i+3] = E; r[i+4] = F; r[i+5] = G; r[i+6] = A; r[i+7] = B; # ABCDEFG -> CDEFABG
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];
-            l2 = d[SC][D] + d[D][E] + d[E][F] + d[F][G] + d[G][A] + d[A][B] + d[B][C] + d[C][FC] # DEFGABC
-            if l2 < l1:
-                print(A,B,C,D,E,F,G,'->',D,E,F,G,A,B,C)
-                r[i+1] = D; r[i+2] = E; r[i+3] = F; r[i+4] = G; r[i+5] = A; r[i+6] = B; r[i+7] = C; # ABCDEFG -> DEFGABC
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];           
-            l2 = d[SC][E] + d[E][F] + d[F][G] + d[G][A] + d[A][B] + d[B][C] + d[C][D] + d[D][FC] # EFGABCD
-            if l2 < l1:
-                print(A,B,C,D,E,F,G,'->',E,F,G,A,B,C,D)
-                r[i+1] = E; r[i+2] = F; r[i+3] = G; r[i+4] = A; r[i+5] = B; r[i+6] = C; r[i+7] = D; # ABCDEFG -> EFGABCD
-                d_min -= l1-l2
-                l1 = l2
-            A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];          
-            l2 = d[SC][F] + d[F][G] + d[G][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][FC] # FGABCDE
-            if l2 < l1:
-                print(A,B,C,D,E,F,G,'->',F,G,A,B,C,D,E)
-                r[i+1] = F; r[i+2] = G; r[i+3] = A; r[i+4] = B; r[i+5] = C; r[i+6] = D; r[i+7] = E; # ABCDEFG -> FGABCDE
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];           
-            l2 = d[SC][G] + d[G][A] + d[A][B] + d[B][C] + d[C][D] + d[D][E] + d[E][F] + d[F][FC] # GABCDEF
-            if l2 < l1:
-                print(A,B,C,D,E,F,G,'->',G,A,B,C,D,E,F)
-                r[i+1] = G; r[i+2] = A; r[i+3] = B; r[i+4] = C; r[i+5] = D; r[i+6] = E; r[i+7] = F;  # ABCDEFG -> GABCDEF
-                d_min -= l1-l2
-                l1 = l2
-                A = r[i+1]; B = r[i+2]; C = r[i+3]; D = r[i+4]; E = r[i+5]; F = r[i+6]; G = r[i+7];           
-        if d_min < d_old: PR()
-
-
-# ## Swap 2 first
-
-# In[ ]:
-
-
-def swap2first():
-    #print("Swap 2 cities, apply the first working result")
-    global d_min,r,c, i_opt,j_opt,dr
-    for i in range(1,N-1):
-        dr_out1 = -d[r[i-1]][r[i]] - d[r[i]][r[i+1]] # r[i] is taken out
-        for j in range(i+1,N):
-            if (j <= i-2) or (i+2 <= j):
-                dr_out2 = -d[r[j-1]][r[j]] - d[r[j]][r[j+1]] # r[j] is taken out
-                dr_in1 = d[r[j-1]][r[i]] + d[r[i]][r[j+1]] # r[i] is put in j
-                dr_in2 = d[r[i-1]][r[j]] + d[r[j]][r[i+1]] # r[j] is put in i
-                dr = dr_out1+dr_out2+dr_in1+dr_in2
-            elif j == i-1:
-                dr_out2 = -d[r[j-1]][r[j]] # r[j] is taken out
-                dr_in = d[r[j-1]][r[i]] + d[r[i]][r[j]] + d[r[j]][r[i+1]] # r[i] is put in j, r[j] is put in i
-                dr = dr_out1+dr_out2+dr_in
-            elif j == i+1:
-                dr_out2 = -d[r[j]][r[j+1]] # r[j] is taken out
-                dr_in = d[r[i-1]][r[j]] + d[r[j]][r[i]] + d[r[i]][r[j+1]] # r[j] is put in i, r[i] is put in j
-                dr = dr_out1+dr_out2+dr_in
-            if dr < 0:
-                d_min = d_min + dr; i_opt=i; j_opt=j;
-                tmp = r[i]; r[i] = r[j]; r[j] = tmp;
-                print(str(r[i])+"<->"+str(r[j])+"; dr="+str(dr))
-                return True
-    if dr == 0: return False
-
-
-# In[58]:
+# In[112]:
 
 
 init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
 while swap2first():
     dm.append(d_min)
-    #i.append(i_opt); j.append(j_opt); dr.append(dr)
+    i.append(i_opt); j.append(j_opt); dr.append(dr_min)
+d_swap2first = dm
 print("Distances =",dm)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm)
 
 
-# In[66]:
+# ### swap2best
+
+# In[115]:
 
 
-d_swap2first = [12713.0, 11648.4, 11558.4, 11274.0, 11177.0, 10530.0, 10324.6, 10285.6, 9901.6, 9849.0, 9789.6, 9560.6, 9545.6, 9539.6, 9183.6, 8842.6, 8822.6, 8590.6, 8575.6, 8494.6, 8231.0, 8097.0, 7996.0, 7638.0, 7449.1, 7448.0, 7372.7, 7229.099999999999, 7216.099999999999, 6999.099999999999, 6930.099999999999, 6848.099999999999, 6816.099999999999, 6780.099999999999, 6757.099999999999, 6741.099999999999, 6610.099999999999, 6562.099999999999, 6509.099999999999, 6438.099999999999, 6429.099999999999, 6147.099999999999, 6131.099999999999, 6061.099999999999, 6042.099999999999, 6004.099999999999]
-d_swap2best = [12713.0, 10830.0, 9493.0, 8615.0, 7916.0, 6833.0, 6098.0, 5514.4, 5332.0, 5077.0, 4947.0, 4831.1, 4609.1, 4585.1, 4577.1]
-
+init(); dm=[d_min]; i=[0]; j=[0]; dr=[0];
+while swap2best():
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); dr.append(dr_min)
+d_swap2best = dm
+print("d_swap2best =",dm)
 plt.figure(1, figsize=(10,10))
-plt.title('Swap 2 cities: best vs first', loc='left')
+plt.plot(dm)
+ver(r)
+
+
+# ### swap3first
+
+# In[130]:
+
+
+init(); dm=[d_min]; i=[0]; j=[0]; k=[0]; dr=[0];
+while swap3first():
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); k.append(k_opt); dr.append(dr_min)
+d_swap3first = dm
+print("d_swap3first =",dm)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+ver(r)
+
+
+# ### swap3best
+
+# In[118]:
+
+
+init(); dm=[d_min]; i=[0]; j=[0]; k=[0]; dr=[0];
+while swap3best():
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); k.append(k_opt); dr.append(dr_min)
+d_swap3best = dm
+print("d_swap3best =",dm)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+ver(r)
+
+
+# ### NN + swap2first
+
+# In[137]:
+
+
+r = r_nn[:]; d_min=d_nn; dm=[d_nn]; i=[0]; j=[0]; dr=[0];
+while swap2first():
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); dr.append(dr_min)
+d_nn_swap2first = dm
+print("d_nn_swap2first =",dm)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+
+
+# ### NN + swap2best
+
+# In[138]:
+
+
+r = r_nn[:]; d_min=d_nn; dm=[d_nn]; i=[0]; j=[0]; dr=[0];
+while swap2best():
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); dr.append(dr_min)
+d_nn_swap2best = dm
+print("d_nn_swap2best =",dm)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+
+
+# ### NN + swap3first
+
+# In[139]:
+
+
+r = r_nn[:]; d_min=d_nn; dm=[d_nn]; i=[0]; j=[0]; k=[0]; dr=[0];
+while swap3first():
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); k.append(k_opt); dr.append(dr_min)
+d_nn_swap3first = dm
+print("d_nn_swap3first =",dm)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+
+
+# ### NN + swap3best
+
+# In[121]:
+
+
+r = r_nn[:]; d_min=d_nn; dm=[d_nn]; i=[0]; j=[0]; k=[0]; dr=[0];
+while swap3best():
+    dm.append(d_min)
+    i.append(i_opt); j.append(j_opt); k.append(k_opt); dr.append(dr_min)
+d_nn_swap3best = dm
+print("d_nn_swap3best =",dm)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm)
+
+
+# In[140]:
+
+
+plt.figure(1, figsize=(16,16))
+plt.title('Swap 2-3 cities and NN: best vs first', loc='center')
+plt.plot(np.array([d_nn]*len(d_swap2first)), color='orange', linestyle='dashed', linewidth=1)
 plt.plot(d_swap2first, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=5)
-plt.plot(d_swap2best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(np.array([3986.1]*len(d_swap2first)), color='red', linestyle='dotted', linewidth=1)
-plt.plot(ypoints, color = 'r')
+plt.plot(d_swap2best, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(d_swap3first, color='green', marker='x', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(d_swap3best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(d_nn_swap2first, color='blue', marker='x', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(d_nn_swap2best, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(d_nn_swap3first, color='green', marker='x', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(d_nn_swap3best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=5)
+plt.plot(np.array([d_minimal]*len(d_swap2first)), color='red', linestyle='dotted', linewidth=2)
 plt.xlabel("swaps")
 plt.ylabel("distance")
 plt.ylim([3900, 12800])
+plt.legend(["nn", "swap2first", "swap2best", "swap3first", "swap3best", "nn_swap2first", "nn_swap2best", "nn_swap3first", "nn_swap3best", "min"])
 plt.show()
 
 
-# In[ ]:
+# In[141]:
 
 
-
+d_best = {"nn":d_nn,
+          "swap2first":d_swap2first[-1],
+          "swap2best":d_swap2best[-1],
+          "swap3first":d_swap3first[-1],
+          "swap3best":d_swap3best[-1],
+          "nn_swap2first":d_nn_swap2first[-1],
+          "nn_swap2best":d_nn_swap2best[-1],
+          "nn_swap3first":d_nn_swap3first[-1],
+          "nn_swap3best":d_nn_swap3best[-1],
+          "optimal":d_opt,
+          "minimal":d_minimal}
+d_best = sorted(d_best.items(), key=lambda x:x[1])
+sortdict = dict(d_best)
+print(sortdict)
 
