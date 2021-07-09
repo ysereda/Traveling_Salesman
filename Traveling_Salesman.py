@@ -499,12 +499,11 @@ nn()
 # In[174]:
 
 
-init(); dm_swap2first=[d_min]; i_swap2first=[0]; j_swap2first=[0]; k_swap2first=[0]; dc_swap2first=[0];
+init(); dm_swap2first=[d_min]; i_swap2first=[0]; j_swap2first=[0]; dc_swap2first=[0];
 while swap2first():
     dm_swap2first.append(d_min)
     i_swap2first.append(i_opt)
     j_swap2first.append(j_opt)
-    k_swap2first.append(k_opt)
     dc_swap2first.append(dc_min)
 d_swap2first = d_min
 r_swap2first = r
@@ -519,12 +518,11 @@ ver(r)
 # In[175]:
 
 
-init(); dm_swap2best=[d_min]; i_swap2best=[0]; j_swap2best=[0]; k_swap2best=[0]; dc_swap2best=[0];
+init(); dm_swap2best=[d_min]; i_swap2best=[0]; j_swap2best=[0]; dc_swap2best=[0];
 while swap2best():
     dm_swap2best.append(d_min)
     i_swap2best.append(i_opt)
     j_swap2best.append(j_opt)
-    k_swap2best.append(k_opt)
     dc_swap2best.append(dc_min)
 d_swap2best = d_min
 r_swap2best = r
@@ -774,53 +772,13 @@ plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap3first_swap2best)
 
 
-# ### swap3best + swap2first
-
-# In[187]:
-
-
-r = r_swap3best[:]; d_min=d_swap3best; dm_swap3best_swap2first=[d_swap3best]; i_swap3best_swap2first=[0]; j_swap3best_swap2first=[0]; k_swap3best_swap2first=[0]; dc_swap3best_swap2first=[0];
-while swap2first():
-    dm_swap3best_swap2first.append(d_min)
-    i_swap3best_swap2first.append(i_opt)
-    j_swap3best_swap2first.append(j_opt)
-    k_swap3best_swap2first.append(k_opt)
-    dc_swap3best_swap2first.append(dc_min)
-d_swap3best_swap2first = d_min
-r_swap3best_swap2first = r
-print("dm_swap3best_swap2first =",dm_swap3best_swap2first)
-ver(r)
-plt.figure(1, figsize=(10,10))
-plt.plot(dm_swap3best_swap2first)
-
-
-# ### swap3best + swap2best
-
-# In[188]:
-
-
-r = r_swap3best[:]; d_min=d_swap3best; dm_swap3best_swap2best=[d_swap3best]; i_swap3best_swap2best=[0]; j_swap3best_swap2best=[0]; k_swap3best_swap2best=[0]; dc_swap3best_swap2best=[0];
-while swap2best():
-    dm_swap3best_swap2best.append(d_min)
-    i_swap3best_swap2best.append(i_opt);
-    j_swap3best_swap2best.append(j_opt);
-    k_swap3best_swap2best.append(k_opt);
-    dc_swap3best_swap2best.append(dc_min)
-d_swap3best_swap2best = d_min
-r_swap3best_swap2best = r
-print("dm_swap3best_swap2best =",dm_swap3best_swap2best)
-ver(r)
-plt.figure(1, figsize=(10,10))
-plt.plot(dm_swap3best_swap2best)
-
-
 # In[ ]:
 
 
 
 
 
-# In[190]:
+# In[185]:
 
 
 plt.figure(1, figsize=(16,16))
@@ -840,17 +798,15 @@ plt.plot(dm_swap2best_swap3first, color='cyan', marker='x', linestyle='dashed', 
 plt.plot(dm_swap2best_swap3best, color='cyan', marker='o', linestyle='dashed', linewidth=1, markersize=5)
 plt.plot(dm_swap3first_swap2first, color='tan', marker='x', linestyle='dashed', linewidth=1, markersize=5)
 plt.plot(dm_swap3first_swap2best, color='tan', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap3best_swap2first, color='yellow', marker='x', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap3best_swap2best, color='yellow', marker='o', linestyle='dashed', linewidth=1, markersize=5)
 plt.plot(np.array([d_minimal]*len(dm_swap2first)), color='red', linestyle='dotted', linewidth=2)
 plt.xlabel("swaps")
 plt.ylabel("distance")
 plt.ylim([3900, 12800])
-plt.legend(["nn", "swap2first", "swap2best", "swap3first", "swap3best", "nn_swap2first", "nn_swap2best", "nn_swap3first", "nn_swap3best", "swap2first_swap3first", "swap2first_swap3best", "swap2best_swap3first", "swap2best_swap3best", "swap3first_swap2first", "swap3first_swap2best", "swap3best_swap2first", "swap3best_swap2best", "min"])
+plt.legend(["nn", "swap2first", "swap2best", "swap3first", "swap3best", "nn_swap2first", "nn_swap2best", "nn_swap3first", "nn_swap3best", "swap2first_swap3first", "swap2first_swap3best", "swap2best_swap3first", "swap2best_swap3best", "swap3first_swap2first", "swap3first_swap2best", "min"])
 plt.show()
 
 
-# In[191]:
+# In[186]:
 
 
 d_best = {"nn":d_nn,
@@ -868,8 +824,6 @@ d_best = {"nn":d_nn,
           "swap2best_swap3best":d_swap2best_swap3best,
           "swap3first_swap2first":d_swap3first_swap2first,
           "swap3first_swap2best":d_swap3first_swap2best,
-          "swap3best_swap2first":d_swap3best_swap2first,
-          "swap3best_swap2best":d_swap3best_swap2best,
           "optimal":d_opt,
           "minimal":d_minimal}
 d_best = sorted(d_best.items(), key=lambda x:x[1])
