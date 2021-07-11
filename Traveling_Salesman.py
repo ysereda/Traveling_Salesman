@@ -6,14 +6,14 @@
 
 # ## Input data
 
-# In[53]:
+# In[1]:
 
 
 import numpy as np # for fast arithmetics
 import matplotlib.pyplot as plt
 
 
-# In[54]:
+# In[2]:
 
 
 # City names alphabetically
@@ -28,7 +28,7 @@ print("Possible ways: ",math.factorial(N-1))
 print(cityNames)
 
 
-# In[55]:
+# In[3]:
 
 
 # Distance matrix using maps.google.com, by car.
@@ -89,7 +89,7 @@ t = np.array([
 # 4) Repeat Steps 2-3 for increasing number <i>n</i> of neighboring cities (3, 4, ..., <i>N</i>-1). Check only <i>n</i>-1 cyclic permutations.<br>
 # 5) All other rearrangements of <i>n</i> cities are addressed by rearranging from <i>n</i>-1 down to 2 cities, Steps 2-3.<br>
 
-# In[129]:
+# In[8]:
 
 
 def PR(): # print current result
@@ -169,10 +169,9 @@ def nn(): # determine nearest-neighbor route
     r_nn.append(0)
     nnc.append(cityNames[0])
     d_nn += d[closest_index][0]
-    print("Nearest-neighbor route:")
-    print(r_nn)
+    print("r_nn =",r_nn)
     #print(nnc)
-    print("Nearest-neighbor distance =",d_nn)
+    print("d_nn =",d_nn)
 
 def swap2first():
     #print("Swap 2 cities, apply the first working result")
@@ -409,7 +408,7 @@ for i in range(2,N):
 ver(r) #Verification of no repeated cities
 
 
-# In[61]:
+# In[5]:
 
 
 init_prev();
@@ -423,18 +422,13 @@ for i in range(2,N):
 ver(r)
 
 
-# In[62]:
+# In[6]:
 
 
 d_opt = 3986.1;
 r_opt = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
-ver(r_opt)
-
-
-# In[63]:
-
-
 d_minimal = d_opt
+ver(r_opt)
 
 
 # ## Results
@@ -488,7 +482,7 @@ plot_tours(cityNames, r)
 # ### Nearest-neighbour path
 # The rule that one first should go from the starting point to the closest point, then to the point closest to this, etc., in general does not yield the shortest route.
 
-# In[111]:
+# In[9]:
 
 
 nn()
@@ -496,7 +490,7 @@ nn()
 
 # ### swap2first
 
-# In[174]:
+# In[10]:
 
 
 init(); dm_swap2first=[d_min]; i_swap2first=[0]; j_swap2first=[0]; dc_swap2first=[0];
@@ -508,6 +502,10 @@ while swap2first():
 d_swap2first = d_min
 r_swap2first = r
 print("dm_swap2first =",dm_swap2first)
+print("r_swap2first =",r)
+print("i_swap2first =",i_swap2first)
+print("j_swap2first =",j_swap2first)
+print("dc_swap2first =",dc_swap2first)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap2first)
 ver(r)
@@ -515,7 +513,7 @@ ver(r)
 
 # ### swap2best
 
-# In[175]:
+# In[11]:
 
 
 init(); dm_swap2best=[d_min]; i_swap2best=[0]; j_swap2best=[0]; dc_swap2best=[0];
@@ -527,6 +525,10 @@ while swap2best():
 d_swap2best = d_min
 r_swap2best = r
 print("dm_swap2best =",dm_swap2best)
+print("r_swap2best =",r)
+print("i_swap2best =",i_swap2best)
+print("j_swap2best =",j_swap2best)
+print("dc_swap2best =",dc_swap2best)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap2best)
 ver(r)
@@ -534,7 +536,7 @@ ver(r)
 
 # ### swap3first
 
-# In[173]:
+# In[12]:
 
 
 init(); dm_swap3first=[d_min]; i_swap3first=[0]; j_swap3first=[0]; k_swap3first=[0]; dc_swap3first=[0];
@@ -547,6 +549,11 @@ while swap3first():
 d_swap3first = d_min
 r_swap3first = r
 print("dm_swap3first =",dm_swap3first)
+print("r_swap3first =",r)
+print("i_swap3first =",i_swap3first)
+print("j_swap3first =",j_swap3first)
+print("k_swap3first =",k_swap3first)
+print("dc_swap3first =",dc_swap3first)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap3first)
 ver(r)
@@ -554,7 +561,7 @@ ver(r)
 
 # ### swap3best
 
-# In[176]:
+# In[13]:
 
 
 init(); dm_swap3best=[d_min]; i_swap3best=[0]; j_swap3best=[0]; k_swap3best=[0]; dc_swap3best=[0];
@@ -567,6 +574,11 @@ while swap3best():
 d_swap3best = d_min
 r_swap3best = r
 print("dm_swap3best =",dm_swap3best)
+print("r_swap3best =",r)
+print("i_swap3best =",i_swap3best)
+print("j_swap3best =",j_swap3best)
+print("k_swap3best =",k_swap3best)
+print("dc_swap3best =",dc_swap3best)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap3best)
 ver(r)
@@ -574,19 +586,22 @@ ver(r)
 
 # ### NN + swap2first
 
-# In[161]:
+# In[32]:
 
 
-r = r_nn[:]; d_min=d_nn; dm_nn_swap2first=[d_nn]; i_nn_swap2first=[0]; j_nn_swap2first=[0]; k_nn_swap2first=[0]; dc_nn_swap2first=[0];
+r = r_nn[:]; d_min=d_nn; dm_nn_swap2first=[d_nn]; i_nn_swap2first=[0]; j_nn_swap2first=[0]; dc_nn_swap2first=[0];
 while swap2first():
     dm_nn_swap2first.append(d_min)
     i_nn_swap2first.append(i_opt)
     j_nn_swap2first.append(j_opt)
-    k_nn_swap2first.append(k_opt)
-    dc_nn_swap2first.append(dr_min)
+    dc_nn_swap2first.append(dc_min)
 d_nn_swap2first = d_min
 r_nn_swap2first = r
 print("dm_nn_swap2first =",dm_nn_swap2first)
+print("r_nn_swap2first =",r)
+print("i_nn_swap2first =",i_nn_swap2first)
+print("j_nn_swap2first =",j_nn_swap2first)
+print("dc_nn_swap2first =",dc_nn_swap2first)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_nn_swap2first)
@@ -594,19 +609,22 @@ plt.plot(dm_nn_swap2first)
 
 # ### NN + swap2best
 
-# In[162]:
+# In[31]:
 
 
-r = r_nn[:]; d_min=d_nn; dm_nn_swap2best=[d_nn]; i_nn_swap2best=[0]; j_nn_swap2best=[0]; k_nn_swap2best=[0]; dc_nn_swap2best=[0];
+r = r_nn[:]; d_min=d_nn; dm_nn_swap2best=[d_nn]; i_nn_swap2best=[0]; j_nn_swap2best=[0]; dc_nn_swap2best=[0];
 while swap2best():
     dm_nn_swap2best.append(d_min)
     i_nn_swap2best.append(i_opt)
     j_nn_swap2best.append(j_opt)
-    k_nn_swap2best.append(k_opt)
-    dc_nn_swap2best.append(dr_min)
+    dc_nn_swap2best.append(dc_min)
 d_nn_swap2best = d_min
 r_nn_swap2best = r
 print("dm_nn_swap2best =",dm_nn_swap2best)
+print("r_nn_swap2best =",r)
+print("i_nn_swap2best =",i_nn_swap2best)
+print("j_nn_swap2best =",j_nn_swap2best)
+print("dc_nn_swap2best =",dc_nn_swap2best)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_nn_swap2best)
@@ -614,7 +632,7 @@ plt.plot(dm_nn_swap2best)
 
 # ### NN + swap3first
 
-# In[177]:
+# In[19]:
 
 
 r = r_nn[:]; d_min=d_nn; dm_nn_swap3first=[d_nn]; i_nn_swap3first=[0]; j_nn_swap3first=[0]; k_nn_swap3first=[0]; dc_nn_swap3first=[0];
@@ -623,10 +641,15 @@ while swap3first():
     i_nn_swap3first.append(i_opt)
     j_nn_swap3first.append(j_opt)
     k_nn_swap3first.append(k_opt)
-    dc_nn_swap3first.append(dr_min)
+    dc_nn_swap3first.append(dc_min)
 d_nn_swap3first = d_min
 r_nn_swap3first = r
 print("dm_nn_swap3first =",dm_nn_swap3first)
+print("r_nn_swap3first =",r)
+print("i_nn_swap3first =",i_nn_swap3first)
+print("j_nn_swap3first =",j_nn_swap3first)
+print("k_nn_swap3first =",k_nn_swap3first)
+print("dc_nn_swap3first =",dc_nn_swap3first)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_nn_swap3first)
@@ -634,7 +657,7 @@ plt.plot(dm_nn_swap3first)
 
 # ### NN + swap3best
 
-# In[178]:
+# In[20]:
 
 
 r = r_nn[:]; d_min=d_nn; dm_nn_swap3best=[d_nn]; i_nn_swap3best=[0]; j_nn_swap3best=[0]; k_nn_swap3best=[0]; dc_nn_swap3best=[0];
@@ -643,10 +666,15 @@ while swap3best():
     i_nn_swap3best.append(i_opt)
     j_nn_swap3best.append(j_opt)
     k_nn_swap3best.append(k_opt)
-    dc_nn_swap3best.append(dr_min)
+    dc_nn_swap3best.append(dc_min)
 d_nn_swap3best = d_min
 r_nn_swap3best = r
 print("dm_nn_swap3best =",dm_nn_swap3best)
+print("r_nn_swap3best =",r)
+print("i_nn_swap3best =",i_nn_swap3best)
+print("j_nn_swap3best =",j_nn_swap3best)
+print("k_nn_swap3best =",k_nn_swap3best)
+print("dc_nn_swap3best =",dc_nn_swap3best)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_nn_swap3best)
@@ -654,7 +682,7 @@ plt.plot(dm_nn_swap3best)
 
 # ### swap2first + swap3first
 
-# In[165]:
+# In[21]:
 
 
 r = r_swap2first[:]; d_min=d_swap2first; dm_swap2first_swap3first=[d_swap2first]; i_swap2first_swap3first=[0]; j_swap2first_swap3first=[0]; k_swap2first_swap3first=[0]; dc_swap2first_swap3first=[0];
@@ -667,6 +695,11 @@ while swap3first():
 d_swap2first_swap3first = d_min
 r_swap2first_swap3first = r
 print("dm_swap2first_swap3first =",dm_swap2first_swap3first)
+print("r_swap2first_swap3first =",r)
+print("i_swap2first_swap3first =",i_swap2first_swap3first)
+print("j_swap2first_swap3first =",j_swap2first_swap3first)
+print("k_swap2first_swap3first =",k_swap2first_swap3first)
+print("dc_swap2first_swap3first =",dc_swap2first_swap3first)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap2first_swap3first)
@@ -674,7 +707,7 @@ plt.plot(dm_swap2first_swap3first)
 
 # ### swap2first + swap3best
 
-# In[168]:
+# In[22]:
 
 
 r = r_swap2first[:]; d_min=d_swap2first; dm_swap2first_swap3best=[d_swap2first]; i_swap2first_swap3best=[0]; j_swap2first_swap3best=[0]; k_swap2first_swap3best=[0]; dc_swap2first_swap3best=[0];
@@ -687,6 +720,11 @@ while swap3best():
 d_swap2first_swap3best = d_min
 r_swap2first_swap3best = r
 print("dm_swap2first_swap3best =",dm_swap2first_swap3best)
+print("r_swap2first_swap3best =",r)
+print("i_swap2first_swap3best =",i_swap2first_swap3best)
+print("j_swap2first_swap3best =",j_swap2first_swap3best)
+print("k_swap2first_swap3best =",k_swap2first_swap3best)
+print("dc_swap2first_swap3best =",dc_swap2first_swap3best)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap2first_swap3best)
@@ -694,7 +732,7 @@ plt.plot(dm_swap2first_swap3best)
 
 # ### swap2best + swap3first
 
-# In[179]:
+# In[24]:
 
 
 r = r_swap2best[:]; d_min=d_swap2best; dm_swap2best_swap3first=[d_swap2best]; i_swap2best_swap3first=[0]; j_swap2best_swap3first=[0]; k_swap2best_swap3first=[0]; dc_swap2best_swap3first=[0];
@@ -707,6 +745,11 @@ while swap3first():
 d_swap2best_swap3first = d_min
 r_swap2best_swap3first = r
 print("dm_swap2best_swap3first =",dm_swap2best_swap3first)
+print("r_swap2best_swap3first =",r)
+print("i_swap2best_swap3first =",i_swap2best_swap3first)
+print("j_swap2best_swap3first =",j_swap2best_swap3first)
+print("k_swap2best_swap3first =",k_swap2best_swap3first)
+print("dc_swap2best_swap3first =",dc_swap2best_swap3first)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap2best_swap3first)
@@ -714,7 +757,7 @@ plt.plot(dm_swap2best_swap3first)
 
 # ### swap2best + swap3best
 
-# In[180]:
+# In[25]:
 
 
 r = r_swap2best[:]; d_min=d_swap2best; dm_swap2best_swap3best=[d_swap2best]; i_swap2best_swap3best=[0]; j_swap2best_swap3best=[0]; k_swap2best_swap3best=[0]; dc_swap2best_swap3best=[0];
@@ -727,6 +770,11 @@ while swap3best():
 d_swap2best_swap3best = d_min
 r_swap2best_swap3best = r
 print("dm_swap2best_swap3best =",dm_swap2best_swap3best)
+print("r_swap2best_swap3best =",r)
+print("i_swap2best_swap3best =",i_swap2best_swap3best)
+print("j_swap2best_swap3best =",j_swap2best_swap3best)
+print("k_swap2best_swap3best =",k_swap2best_swap3best)
+print("dc_swap2best_swap3best =",dc_swap2best_swap3best)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap2best_swap3best)
@@ -734,19 +782,22 @@ plt.plot(dm_swap2best_swap3best)
 
 # ### swap3first + swap2first
 
-# In[183]:
+# In[27]:
 
 
-r = r_swap3first[:]; d_min=d_swap3first; dm_swap3first_swap2first=[d_swap3first]; i_swap3first_swap2first=[0]; j_swap3first_swap2first=[0]; k_swap3first_swap2first=[0]; dc_swap3first_swap2first=[0];
+r = r_swap3first[:]; d_min=d_swap3first; dm_swap3first_swap2first=[d_swap3first]; i_swap3first_swap2first=[0]; j_swap3first_swap2first=[0]; dc_swap3first_swap2first=[0];
 while swap2first():
     dm_swap3first_swap2first.append(d_min)
     i_swap3first_swap2first.append(i_opt)
     j_swap3first_swap2first.append(j_opt)
-    k_swap3first_swap2first.append(k_opt)
     dc_swap3first_swap2first.append(dc_min)
 d_swap3first_swap2first = d_min
 r_swap3first_swap2first = r
 print("dm_swap3first_swap2first =",dm_swap3first_swap2first)
+print("r_swap3first_swap2first =",r)
+print("i_swap3first_swap2first =",i_swap3first_swap2first)
+print("j_swap3first_swap2first =",j_swap3first_swap2first)
+print("dc_swap3first_swap2first =",dc_swap3first_swap2first)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap3first_swap2first)
@@ -754,22 +805,163 @@ plt.plot(dm_swap3first_swap2first)
 
 # ### swap3first + swap2best
 
-# In[184]:
+# In[28]:
 
 
-r = r_swap3first[:]; d_min=d_swap3first; dm_swap3first_swap2best=[d_swap3first]; i_swap3first_swap2best=[0]; j_swap3first_swap2best=[0]; k_swap3first_swap2best=[0]; dc_swap3first_swap2best=[0];
+r = r_swap3first[:]; d_min=d_swap3first; dm_swap3first_swap2best=[d_swap3first]; i_swap3first_swap2best=[0]; j_swap3first_swap2best=[0]; dc_swap3first_swap2best=[0];
 while swap2best():
     dm_swap3first_swap2best.append(d_min)
     i_swap3first_swap2best.append(i_opt)
     j_swap3first_swap2best.append(j_opt)
-    k_swap3first_swap2best.append(k_opt)
     dc_swap3first_swap2best.append(dc_min)
 d_swap3first_swap2best = d_min
 r_swap3first_swap2best = r
 print("dm_swap3first_swap2best =",dm_swap3first_swap2best)
+print("r_swap3first_swap2best =",r)
+print("i_swap3first_swap2best =",i_swap3first_swap2best)
+print("j_swap3first_swap2best =",j_swap3first_swap2best)
+print("dc_swap3first_swap2best =",dc_swap3first_swap2best)
 ver(r)
 plt.figure(1, figsize=(10,10))
 plt.plot(dm_swap3first_swap2best)
+
+
+# ### swap3best + swap2first
+
+# In[33]:
+
+
+r = r_swap3best[:]; d_min=d_swap3best; dm_swap3best_swap2first=[d_swap3best]; i_swap3best_swap2first=[0]; j_swap3best_swap2first=[0]; dc_swap3best_swap2first=[0];
+while swap2first():
+    dm_swap3best_swap2first.append(d_min)
+    i_swap3best_swap2first.append(i_opt)
+    j_swap3best_swap2first.append(j_opt)
+    dc_swap3best_swap2first.append(dc_min)
+d_swap3best_swap2first = d_min
+r_swap3best_swap2first = r
+print("dm_swap3best_swap2first =",dm_swap3best_swap2first)
+print("r_swap3best_swap2first =",r)
+print("i_swap3best_swap2first =",i_swap3best_swap2first)
+print("j_swap3best_swap2first =",j_swap3best_swap2first)
+print("dc_swap3best_swap2first =",dc_swap3best_swap2first)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm_swap3best_swap2first)
+
+
+# ### swap3best + swap2best
+
+# In[34]:
+
+
+r = r_swap3best[:]; d_min=d_swap3best; dm_swap3best_swap2best=[d_swap3best]; i_swap3best_swap2best=[0]; j_swap3best_swap2best=[0]; dc_swap3best_swap2best=[0];
+while swap2best():
+    dm_swap3best_swap2best.append(d_min)
+    i_swap3best_swap2best.append(i_opt)
+    j_swap3best_swap2best.append(j_opt)
+    dc_swap3best_swap2best.append(dc_min)
+d_swap3best_swap2best = d_min
+r_swap3best_swap2best = r
+print("dm_swap3best_swap2best =",dm_swap3best_swap2best)
+print("r_swap3best_swap2best =",r)
+print("i_swap3best_swap2best =",i_swap3best_swap2best)
+print("j_swap3best_swap2best =",j_swap3best_swap2best)
+print("dc_swap3best_swap2best =",dc_swap3best_swap2best)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm_swap3best_swap2best)
+
+
+# ### swap2first + swap3first + swap2first
+
+# In[47]:
+
+
+r = r_swap2first_swap3first[:]; d_min=d_swap2first_swap3first; dm_s2f_s3f_s2f=[d_swap2first_swap3first]; i_s2f_s3f_s2f=[0]; j_s2f_s3f_s2f=[0]; dc_s2f_s3f_s2f=[0];
+while swap2first():
+    dm_s2f_s3f_s2f.append(d_min)
+    i_s2f_s3f_s2f.append(i_opt)
+    j_s2f_s3f_s2f.append(j_opt)
+    dc_s2f_s3f_s2f.append(dc_min)
+d_s2f_s3f_s2f = d_min
+r_s2f_s3f_s2f = r
+print("dm_s2f_s3f_s2f =",dm_s2f_s3f_s2f)
+print("r_s2f_s3f_s2f =",r)
+print("i_s2f_s3f_s2f =",i_s2f_s3f_s2f)
+print("j_s2f_s3f_s2f =",j_s2f_s3f_s2f)
+print("dc_s2f_s3f_s2f =",dc_s2f_s3f_s2f)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm_s2f_s3f_s2f)
+
+
+# ### swap2first + swap3first + swap2best
+
+# In[51]:
+
+
+r = r_swap2first_swap3first[:]; d_min=d_swap2first_swap3first; dm_s2f_s3f_s2b=[d_swap2first_swap3first]; i_s2f_s3f_s2b=[0]; j_s2f_s3f_s2b=[0]; dc_s2f_s3f_s2b=[0];
+while swap2best():
+    dm_s2f_s3f_s2b.append(d_min)
+    i_s2f_s3f_s2b.append(i_opt)
+    j_s2f_s3f_s2b.append(j_opt)
+    dc_s2f_s3f_s2b.append(dc_min)
+d_s2f_s3f_s2b = d_min
+r_s2f_s3f_s2b = r
+print("dm_s2f_s3f_s2b =",dm_s2f_s3f_s2b)
+print("r_s2f_s3f_s2b =",r)
+print("i_s2f_s3f_s2b =",i_s2f_s3f_s2b)
+print("j_s2f_s3f_s2b =",j_s2f_s3f_s2b)
+print("dc_s2f_s3f_s2b =",dc_s2f_s3f_s2b)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm_s2f_s3f_s2b)
+
+
+# ### swap2first + swap3best + swap2first
+
+# In[98]:
+
+
+r = r_swap2first_swap3best[:]; d_min=d_swap2first_swap3best; dm_s2f_s3b_s2f=[d_swap2first_swap3best]; i_s2f_s3b_s2f=[0]; j_s2f_s3b_s2f=[0]; dc_s2f_s3b_s2f=[0];
+while swap2first():
+    dm_s2f_s3b_s2f.append(d_min)
+    i_s2f_s3b_s2f.append(i_opt)
+    j_s2f_s3b_s2f.append(j_opt)
+    dc_s2f_s3b_s2f.append(dc_min)
+d_s2f_s3b_s2f = d_min
+r_s2f_s3b_s2f = r
+print("dm_s2f_s3b_s2f =",dm_s2f_s3b_s2f)
+print("r_s2f_s3b_s2f =",r)
+print("i_s2f_s3b_s2f =",i_s2f_s3b_s2f)
+print("j_s2f_s3b_s2f =",j_s2f_s3b_s2f)
+print("dc_s2f_s3b_s2f =",dc_s2f_s3b_s2f)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm_s2f_s3b_s2f)
+
+
+# ### swap2first + swap3best + swap2best
+
+# In[103]:
+
+
+r = r_swap2first_swap3best[:]; d_min=d_swap2first_swap3best; dm_s2f_s3b_s2b=[d_swap2first_swap3best]; i_s2f_s3b_s2b=[0]; j_s2f_s3b_s2b=[0]; dc_s2f_s3b_s2b=[0];
+while swap2best():
+    dm_s2f_s3b_s2b.append(d_min)
+    i_s2f_s3b_s2b.append(i_opt)
+    j_s2f_s3b_s2b.append(j_opt)
+    dc_s2f_s3b_s2b.append(dc_min)
+d_s2f_s3b_s2b = d_min
+r_s2f_s3b_s2b = r
+print("dm_s2f_s3b_s2b =",dm_s2f_s3b_s2b)
+print("r_s2f_s3b_s2b =",r)
+print("i_s2f_s3b_s2b =",i_s2f_s3b_s2b)
+print("j_s2f_s3b_s2b =",j_s2f_s3b_s2b)
+print("dc_s2f_s3b_s2b =",dc_s2f_s3b_s2b)
+ver(r)
+plt.figure(1, figsize=(10,10))
+plt.plot(dm_s2f_s3b_s2b)
 
 
 # In[ ]:
@@ -778,55 +970,208 @@ plt.plot(dm_swap3first_swap2best)
 
 
 
-# In[185]:
+# In[48]:
+
+
+r_nn = [0, 18, 14, 4, 8, 7, 12, 2, 5, 20, 13, 11, 16, 1, 3, 6, 19, 9, 17, 10, 21, 15, 0]
+d_nn = 4831.1
+
+dm_swap2first = [12713.0, 11648.4, 11558.4, 11274.0, 11177.0, 10530.0, 10324.6, 10285.6, 9901.6, 9849.0, 9789.6, 9560.6, 9545.6, 9539.6, 9183.6, 8842.6, 8822.6, 8590.6, 8575.6, 8494.6, 8231.0, 8097.0, 7996.0, 7638.0, 7449.1, 7448.0, 7372.7, 7229.099999999999, 7216.099999999999, 6999.099999999999, 6930.099999999999, 6848.099999999999, 6816.099999999999, 6780.099999999999, 6757.099999999999, 6741.099999999999, 6610.099999999999, 6562.099999999999, 6509.099999999999, 6438.099999999999, 6429.099999999999, 6147.099999999999, 6131.099999999999, 6061.099999999999, 6042.099999999999, 6004.099999999999]
+r_swap2first = [0, 6, 11, 16, 13, 12, 7, 8, 14, 10, 9, 17, 3, 1, 21, 4, 15, 18, 2, 5, 20, 19, 0]
+i_swap2first = [0, 1, 1, 1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 7, 7, 8, 7, 8, 10, 16, 16, 14, 8, 17, 8, 18, 18, 19]
+j_swap2first = [0, 2, 3, 12, 2, 4, 7, 2, 6, 6, 5, 2, 18, 16, 2, 4, 2, 3, 11, 2, 11, 13, 4, 17, 10, 9, 11, 13, 20, 18, 20, 8, 15, 15, 8, 14, 11, 20, 21, 16, 16, 20, 16, 19, 21, 20]
+dc_swap2first = [0, -1064.6, -90.00000000000011, -284.4000000000001, -97.0, -647.0, -205.39999999999998, -39.0, -384.0, -52.59999999999991, -59.39999999999998, -229.0, -15.0, -6.0, -356.0, -341.0, -20.0, -232.0, -15.0, -81.0, -263.6, -134.0, -101.0, -358.0, -188.9000000000001, -1.099999999999909, -75.30000000000007, -143.60000000000002, -13.0, -217.0, -69.0, -82.0, -32.0, -36.0, -23.0, -16.0, -131.0, -48.0, -53.0, -71.0, -9.0, -282.0, -16.0, -70.0, -19.0, -38.0]
+
+dm_swap2best = [12713.0, 10830.0, 9493.0, 8615.0, 7916.0, 6833.0, 6098.0, 5514.4, 5332.0, 5077.0, 4947.0, 4831.1, 4609.1, 4585.1, 4577.1]
+r_swap2best = [0, 18, 14, 12, 7, 8, 15, 4, 21, 2, 10, 9, 17, 6, 3, 1, 11, 16, 13, 19, 20, 5, 0]
+i_swap2best = [0, 3, 1, 11, 5, 6, 9, 13, 4, 5, 16, 12, 13, 2, 11]
+j_swap2best = [0, 12, 18, 17, 21, 15, 14, 18, 7, 8, 17, 14, 15, 9, 12]
+dc_swap2best = [0, -1883.0, -1337.0, -878.0, -699.0, -1083.0, -735.0, -583.6, -182.39999999999998, -255.0, -130.0, -115.89999999999998, -222.0, -24.0, -8.0]
+
+dm_swap3first = [12713.0, 11558.4, 9330.0, 8164.0, 7281.1, 6814.1, 6432.1, 5961.1, 5826.1, 5823.0, 5797.1, 5735.1, 5575.6, 5445.0, 5354.0, 5179.0, 4828.0, 4397.0, 4336.0, 4278.1, 4251.1]
+r_swap3first = [0, 18, 21, 4, 8, 15, 14, 12, 7, 2, 5, 20, 13, 16, 11, 3, 1, 17, 9, 10, 6, 19, 0]
+i_swap3first = [0, 1, 6, 5, 9, 3, 10, 11, 6, 16, 16, 12, 2, 1, 1, 12, 2, 1, 1, 17, 3]
+j_swap3first = [0, 2, 12, 15, 18, 9, 15, 14, 7, 17, 17, 15, 16, 14, 11, 13, 10, 9, 2, 18, 4]
+k_swap3first = [0, 3, 16, 18, 21, 14, 16, 21, 8, 18, 18, 20, 19, 15, 12, 14, 21, 10, 3, 19, 6]
+dc_swap3first = [0, -1154.6, -2228.4, -1166.0, -882.9000000000001, -467.0, -382.0, -471.0, -135.0, -3.1000000000000227, -25.899999999999977, -62.0, -159.5, -130.5999999999999, -91.0, -175.0, -351.0, -431.0, -61.0, -57.89999999999998, -27.0]
+
+dm_swap3best = [12713.0, 10204.0, 8664.0, 7856.6, 6268.6, 5430.6, 5034.1, 4834.1, 4735.1]
+r_swap3best = [0, 18, 8, 15, 4, 21, 14, 7, 12, 19, 1, 3, 16, 13, 11, 6, 17, 9, 10, 5, 20, 2, 0]
+i_swap3best = [0, 3, 1, 3, 5, 2, 9, 5, 9]
+j_swap3best = [0, 12, 10, 6, 14, 8, 16, 6, 11]
+k_swap3best = [0, 16, 18, 15, 19, 21, 17, 8, 14]
+dc_swap3best = [0, -2509.0, -1540.0, -807.4000000000001, -1588.0, -838.0, -396.5, -200.0, -99.0]
+
+dm_nn_swap2first = [4831.1, 4800.1, 4777.1, 4638.1, 4502.1, 4459.1, 4370.1, 4362.1]
+r_nn_swap2first = [0, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 19, 6, 17, 9, 10, 14, 18, 0]
+i_nn_swap2first = [0, 2, 1, 1, 2, 11, 15, 17]
+j_nn_swap2first = [0, 20, 21, 2, 3, 12, 16, 18]
+dc_nn_swap2first = [0, -31.0, -23.0, -139.0, -136.0, -43.0, -89.0, -8.0]
+
+dm_nn_swap2best = [4831.1, 4700.1, 4611.1, 4568.1, 4537.1, 4415.1, 4370.1, 4362.1]
+r_nn_swap2best = [0, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 19, 6, 17, 9, 10, 14, 18, 0]
+i_nn_swap2best = [0, 3, 15, 11, 2, 1, 20, 17]
+j_nn_swap2best = [0, 21, 16, 12, 21, 20, 21, 18]
+dc_nn_swap2best = [0, -131.0, -89.0, -43.0, -31.0, -122.0, -45.0, -8.0]
+
+dm_nn_swap3first = [4831.1, 4668.1, 4667.1, 4632.1]
+r_nn_swap3first = [0, 21, 4, 8, 15, 7, 12, 2, 5, 20, 13, 11, 16, 1, 3, 6, 19, 9, 17, 10, 18, 14, 0]
+i_nn_swap3first = [0, 1, 2, 1]
+j_nn_swap3first = [0, 2, 3, 20]
+k_nn_swap3first = [0, 21, 4, 21]
+dc_nn_swap3first = [0, -163.0, -1.0, -35.0]
+
+dm_nn_swap3best = [4831.1, 4668.1, 4667.1, 4632.1]
+r_nn_swap3best = [0, 21, 4, 8, 15, 7, 12, 2, 5, 20, 13, 11, 16, 1, 3, 6, 19, 9, 17, 10, 18, 14, 0]
+i_nn_swap3best = [0, 1, 2, 1]
+j_nn_swap3best = [0, 2, 3, 20]
+k_nn_swap3best = [0, 21, 4, 21]
+dc_nn_swap3best = [0, -163.0, -1.0, -35.0]
+
+dm_swap2first_swap3first = [6004.099999999999, 5922.099999999999, 5873.5, 5775.1, 5473.1, 5253.1, 5110.1, 5049.1, 4991.0, 4933.1, 4871.1]
+r_swap2first_swap3first = [0, 19, 11, 16, 13, 20, 5, 2, 10, 9, 17, 1, 3, 6, 21, 4, 15, 8, 12, 7, 14, 18, 0]
+i_swap2first_swap3first = [0, 7, 5, 6, 7, 5, 1, 18, 8, 8, 1]
+j_swap2first_swap3first = [0, 8, 18, 18, 18, 8, 5, 19, 11, 9, 7]
+k_swap2first_swap3first = [0, 17, 21, 19, 20, 21, 7, 20, 13, 10, 13]
+dc_swap2first_swap3first = [0, -82.0, -48.59999999999991, -98.40000000000009, -302.0, -220.0, -143.0, -61.0, -58.09999999999991, -57.89999999999998, -62.0]
+
+dm_swap2first_swap3best = [6004.099999999999, 5922.099999999999, 5873.5, 5775.1, 5473.1, 5218.1, 5068.1, 4960.1, 4792.1, 4730.1, 4669.1]
+r_swap2first_swap3best = [0, 2, 5, 20, 13, 11, 16, 19, 6, 10, 9, 17, 3, 1, 21, 4, 15, 8, 12, 7, 14, 18, 0]
+i_swap2first_swap3best = [0, 7, 5, 6, 7, 1, 5, 2, 3, 4, 18]
+j_swap2first_swap3best = [0, 8, 18, 18, 18, 8, 6, 4, 5, 5, 19]
+k_swap2first_swap3best = [0, 17, 21, 19, 20, 21, 7, 5, 6, 6, 20]
+dc_swap2first_swap3best = [0, -82.0, -48.59999999999991, -98.40000000000009, -302.0, -255.0, -150.0, -108.0, -168.0, -62.0, -61.0]
+
+dm_swap2best_swap3first = [4577.1, 4511.1, 4438.1, 4240.1]
+r_swap2best_swap3first = [0, 18, 14, 12, 7, 8, 15, 4, 21, 10, 17, 9, 6, 19, 3, 1, 11, 16, 13, 20, 5, 2, 0]
+i_swap2best_swap3first = [0, 19, 9, 9]
+j_swap2best_swap3first = [0, 20, 13, 10]
+k_swap2best_swap3first = [0, 21, 21, 12]
+dc_swap2best_swap3first = [0, -66.0, -73.0, -198.0]
+
+dm_swap2best_swap3best = [4577.1, 4511.1, 4438.1, 4240.1]
+r_swap2best_swap3best = [0, 18, 14, 12, 7, 8, 15, 4, 21, 10, 17, 9, 6, 19, 3, 1, 11, 16, 13, 20, 5, 2, 0]
+i_swap2best_swap3best = [0, 19, 9, 9]
+j_swap2best_swap3best = [0, 20, 13, 10]
+k_swap2best_swap3best = [0, 21, 21, 12]
+dc_swap2best_swap3best = [0, -66.0, -73.0, -198.0]
+
+dm_swap3first_swap2first = [4251.1, 4194.1, 4129.1, 4014.1000000000004]
+r_swap3first_swap2first = [0, 18, 21, 4, 15, 8, 14, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+i_swap3first_swap2first = [0, 4, 7, 15]
+j_swap3first_swap2first = [0, 5, 8, 16]
+dc_swap3first_swap2first = [0, -57.0, -65.0, -115.0]
+
+dm_swap3first_swap2best = [4251.1, 4136.1, 4071.1000000000004, 4014.1000000000004]
+r_swap3first_swap2best = [0, 18, 21, 4, 15, 8, 14, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+i_swap3first_swap2best = [0, 15, 7, 4]
+j_swap3first_swap2best = [0, 16, 8, 5]
+dc_swap3first_swap2best = [0, -115.0, -65.0, -57.0]
+
+dm_swap3best_swap2first = [4735.1, 4719.1, 4712.1]
+r_swap3best_swap2first = [0, 18, 8, 15, 4, 21, 14, 7, 12, 19, 3, 1, 16, 13, 11, 6, 17, 9, 10, 20, 5, 2, 0]
+i_swap3best_swap2first = [0, 10, 19]
+j_swap3best_swap2first = [0, 11, 20]
+dc_swap3best_swap2first = [0, -16.0, -7.0]
+
+dm_swap3best_swap2best = [4735.1, 4719.1, 4712.1]
+r_swap3best_swap2best = [0, 18, 8, 15, 4, 21, 14, 7, 12, 19, 3, 1, 16, 13, 11, 6, 17, 9, 10, 20, 5, 2, 0]
+i_swap3best_swap2best = [0, 10, 19]
+j_swap3best_swap2best = [0, 11, 20]
+dc_swap3best_swap2best = [0, -16.0, -7.0]
+
+dm_s2f_s3f_s2f = [4871.1, 4869.1, 4791.1, 4752.1]
+r_s2f_s3f_s2f = [0, 2, 11, 16, 13, 20, 5, 19, 10, 9, 17, 3, 1, 6, 21, 4, 15, 8, 7, 12, 14, 18, 0]
+i_s2f_s3f_s2f = [0, 1, 11, 18]
+j_s2f_s3f_s2f = [0, 7, 12, 19]
+dc_s2f_s3f_s2f = [0, -2.0, -78.0, -39.0]
+
+dm_s2f_s3f_s2b = [4871.1, 4793.1, 4754.1, 4752.1]
+r_s2f_s3f_s2b = [0, 2, 11, 16, 13, 20, 5, 19, 10, 9, 17, 3, 1, 6, 21, 4, 15, 8, 7, 12, 14, 18, 0]
+i_s2f_s3f_s2b = [0, 11, 18, 1]
+j_s2f_s3f_s2b = [0, 12, 19, 7]
+dc_s2f_s3f_s2b = [0, -78.0, -39.0, -2.0]
+
+dm_s2f_s3b_s2f = [4669.1, 4541.1, 4502.1]
+r_s2f_s3b_s2f = [0, 2, 5, 20, 13, 16, 11, 19, 6, 10, 9, 17, 3, 1, 21, 4, 15, 8, 7, 12, 14, 18, 0]
+i_s2f_s3b_s2f = [0, 5, 18]
+j_s2f_s3b_s2f = [0, 6, 19]
+dc_s2f_s3b_s2f = [0, -128.0, -39.0]
+
+dm_s2f_s3b_s2b = [4669.1, 4541.1, 4502.1]
+r_s2f_s3b_s2b = [0, 2, 5, 20, 13, 16, 11, 19, 6, 10, 9, 17, 3, 1, 21, 4, 15, 8, 7, 12, 14, 18, 0]
+i_s2f_s3b_s2b = [0, 5, 18]
+j_s2f_s3b_s2b = [0, 6, 19]
+dc_s2f_s3b_s2b = [0, -128.0, -39.0]
+
+
+# In[104]:
 
 
 plt.figure(1, figsize=(16,16))
 plt.title('Swap 2-3 cities and NN: best vs first', loc='center')
-plt.plot(np.array([d_nn]*len(dm_swap2first)), color='orange', linestyle='dashed', linewidth=1)
-plt.plot(dm_swap2first, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=5)
-plt.plot(dm_swap2best, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap3first, color='green', marker='x', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap3best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_nn_swap2first, color='blue', marker='x', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_nn_swap2best, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_nn_swap3first, color='green', marker='x', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_nn_swap3best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap2first_swap3first, color='cyan', marker='x', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap2first_swap3best, color='cyan', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap2best_swap3first, color='cyan', marker='x', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap2best_swap3best, color='cyan', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap3first_swap2first, color='tan', marker='x', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(dm_swap3first_swap2best, color='tan', marker='o', linestyle='dashed', linewidth=1, markersize=5)
-plt.plot(np.array([d_minimal]*len(dm_swap2first)), color='red', linestyle='dotted', linewidth=2)
+plt.plot(np.array([d_nn]*(len(dm_swap2first)+len(dm_swap2first_swap3first)+len(dm_s2f_s3f_s2f))), color='orange', linestyle='dashed', linewidth=1)
+plt.plot(dm_swap2first, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(dm_swap2best, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(dm_swap3first, color='green', marker='x', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(dm_swap3best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(dm_nn_swap2first, color='blue', marker='x', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(dm_nn_swap2best, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(dm_nn_swap3first, color='green', marker='x', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(dm_nn_swap3best, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2first)-1, len(dm_swap2first)+len(dm_swap2first_swap3first)-1), dm_swap2first_swap3first, color='green', marker='x', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2first)-1, len(dm_swap2first)+len(dm_swap2first_swap3best)-1), dm_swap2first_swap3best, color='green', marker='o', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2best)-1, len(dm_swap2best)+len(dm_swap2best_swap3first)-1), dm_swap2best_swap3first, color='green', marker='x', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2best)-1, len(dm_swap2best)+len(dm_swap2best_swap3best)-1), dm_swap2best_swap3best, color='green', marker='o', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap3first)-1, len(dm_swap3first)+len(dm_swap3first_swap2first)-1), dm_swap3first_swap2first, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap3first)-1, len(dm_swap3first)+len(dm_swap3first_swap2best)-1), dm_swap3first_swap2best, color='blue', marker='o', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap3best)-1, len(dm_swap3best)+len(dm_swap3best_swap2first)-1), dm_swap3best_swap2first, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap3best)-1, len(dm_swap3best)+len(dm_swap3best_swap2best)-1), dm_swap3best_swap2best, color='blue', marker='o', linestyle='solid', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2first)+len(dm_swap2first_swap3first)-2, len(dm_swap2first)+len(dm_swap2first_swap3first)+len(dm_s2f_s3f_s2f)-2), dm_s2f_s3f_s2f, color='blue', marker='x', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2first)+len(dm_swap2first_swap3first)-2, len(dm_swap2first)+len(dm_swap2first_swap3first)+len(dm_s2f_s3f_s2b)-2), dm_s2f_s3f_s2b, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2first)+len(dm_swap2first_swap3best)-2, len(dm_swap2first)+len(dm_swap2first_swap3best)+len(dm_s2f_s3b_s2f)-2), dm_s2f_s3b_s2f, color='blue', marker='x', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(np.arange(len(dm_swap2first)+len(dm_swap2first_swap3best)-2, len(dm_swap2first)+len(dm_swap2first_swap3best)+len(dm_s2f_s3b_s2b)-2), dm_s2f_s3b_s2b, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+plt.plot(np.array([d_minimal]*(len(dm_swap2first)+len(dm_swap2first_swap3first)+len(dm_s2f_s3f_s2f))), color='red', linestyle='dotted', linewidth=2)
 plt.xlabel("swaps")
 plt.ylabel("distance")
 plt.ylim([3900, 12800])
-plt.legend(["nn", "swap2first", "swap2best", "swap3first", "swap3best", "nn_swap2first", "nn_swap2best", "nn_swap3first", "nn_swap3best", "swap2first_swap3first", "swap2first_swap3best", "swap2best_swap3first", "swap2best_swap3best", "swap3first_swap2first", "swap3first_swap2best", "min"])
+plt.legend(["nn", "swap2first", "swap2best", "swap3first", "swap3best", "nn_swap2first", "nn_swap2best", "nn_swap3first", "nn_swap3best", "swap2first_swap3first", "swap2first_swap3best", "swap2best_swap3first", "swap2best_swap3best", "swap3first_swap2first", "swap3first_swap2best", "swap3best_swap2first", "swap3best_swap2best", "s2f_s3f_s2f", "s2f_s3f_s2b", "s2f_s3b_s2f", "s2f_s3b_s2b", "min"])
 plt.show()
 
 
-# In[186]:
+# In[105]:
 
 
 d_best = {"nn":d_nn,
-          "swap2first":d_swap2first,
-          "swap2best":d_swap2best,
-          "swap3first":d_swap3first,
-          "swap3best":d_swap3best,
-          "nn_swap2first":d_nn_swap2first,
-          "nn_swap2best":d_nn_swap2best,
-          "nn_swap3first":d_nn_swap3first,
-          "nn_swap3best":d_nn_swap3best,
-          "swap2first_swap3first":d_swap2first_swap3first,
-          "swap2first_swap3best":d_swap2first_swap3best,
-          "swap2best_swap3first":d_swap2best_swap3first,
-          "swap2best_swap3best":d_swap2best_swap3best,
-          "swap3first_swap2first":d_swap3first_swap2first,
-          "swap3first_swap2best":d_swap3first_swap2best,
+          "s2f":d_swap2first,
+          "s2b":d_swap2best,
+          "s3f":d_swap3first,
+          "s3b":d_swap3best,
+          "nn_s2f":d_nn_swap2first,
+          "nn_s2b":d_nn_swap2best,
+          "nn_s3f":d_nn_swap3first,
+          "nn_s3b":d_nn_swap3best,
+          "s2f_s3f":d_swap2first_swap3first,
+          "s2f_s3b":d_swap2first_swap3best,
+          "s2b_s3f":d_swap2best_swap3first,
+          "s2b_s3b":d_swap2best_swap3best,
+          "s3f_s2f":d_swap3first_swap2first,
+          "s3f_s2b":d_swap3first_swap2best,
+          "s3b_s2f":d_swap3best_swap2first,
+          "s3b_s2b":d_swap3best_swap2best,
+          "s2f_s3f_s2f":d_s2f_s3f_s2f,
+          "s2f_s3f_s2b":d_s2f_s3f_s2b,
+          "s2f_s3b_s2f":d_s2f_s3b_s2f,
+          "s2f_s3b_s2b":d_s2f_s3b_s2b,
           "optimal":d_opt,
           "minimal":d_minimal}
 d_best = sorted(d_best.items(), key=lambda x:x[1])
 sortdict = dict(d_best)
 print(sortdict)
+
+
+# In[ ]:
+
+
+
 
