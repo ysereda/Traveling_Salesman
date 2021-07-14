@@ -6,14 +6,14 @@
 
 # ## Input data
 
-# In[1]:
+# In[3]:
 
 
 import numpy as np # for fast arithmetics
 import matplotlib.pyplot as plt
 
 
-# In[2]:
+# In[4]:
 
 
 # City names alphabetically
@@ -28,7 +28,7 @@ print("Possible ways: ",math.factorial(N-1))
 print(cityNames)
 
 
-# In[3]:
+# In[5]:
 
 
 # Distance matrix using maps.google.com, by car.
@@ -89,35 +89,39 @@ t = np.array([
 # 4) Repeat Steps 2-3 for increasing number <i>n</i> of neighboring cities (3, 4, ..., <i>N</i>-1). Check only <i>n</i>-1 cyclic permutations.<br>
 # 5) All other rearrangements of <i>n</i> cities are addressed by rearranging from <i>n</i>-1 down to 2 cities, Steps 2-3.<br>
 
-# In[4]:
+# In[25]:
 
 
 def PR(): # print current result
     global r,d_min
     print("d =",d_min,"; r =",r)
 def init():
-    global d_min,r
+    global d_min,r,dm
     d_min=0 # current minimal distance
     r=[0] # r - current shortest route: a list of city numbers along the currently shortest route
     for i in range(1,N):
         d_min += d[i-1][i]
         r.append(i)
     d_min += d[0][N-1]
+    dm = [d_min]
     r.append(0) # The last item in the list is the same as the 1st element
     PR()
 def init_prev():
-    global d_min,r
+    global d_min,r,dm,r_prev
     d_min=0 # current minimal distance
     # r - current shortest route: a list of city numbers along the currently shortest route, Distance = 3986.1
-    r = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+    #d = 22195990;
+    #r = [0, 17, 23, 41, 2, 35, 42, 30, 5, 49, 11, 43, 1, 27, 3, 4, 36, 46, 25, 33, 40, 26, 22, 48, 14, 15, 24, 12, 13, 16, 34, 21, 47, 45, 8, 19, 7, 37, 31, 6, 38, 20, 18, 28, 44, 29, 32, 39, 10, 9, 0]
+    r = r_prev
     for i in range(1,N):
         d_min += d[r[i-1]][r[i]]
     d_min += d[0][r[N-1]]
+    dm = [d_min]
     PR()
 
 def optcities(n):
     #print("Rearrange ",n," cities:")
-    global d_min,r
+    global d_min,r,dm
     d_old = d_min+1 # keep track if distance has decreased
     while d_min < d_old:
         d_old = d_min # current minimal distance
@@ -145,6 +149,7 @@ def optcities(n):
                     for j in range(n):
                         r[i+1+j] = D[j]; # apply successfull cycling C -> D
                     d_min -= l1-l2 # update the minimal distance
+                    dm.append(d_min) #history of distances after each swapping for plotting
                     l1 = l2 # update the distance of (SC - n cycled cities - FC)
                     C = D; # update the list of n cycled cities
         
@@ -399,30 +404,69 @@ def ver(rv):
 
 # ## Run
 
-# In[60]:
+# In[37]:
 
 
 init();
-for i in range(2,N):
+for i in range(2,N+1):
+    print("i =",i)
     optcities(i);
-ver(r) #Verification of no repeated cities
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), increasing n")
+    ver(r) # Verification of no repeated cities
+d_oi = d_min; print("d_oi =",d_min)
+r_oi = r; print("r_oi =",r)
+dm_oi = dm; print("dm_oi =",dm)
 
 
-# In[5]:
+# In[43]:
 
 
+init();
+for i in range(N,1,-1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r)
+d_od = d_min; print("d_od =",d_min)
+r_od = r; print("r_od =",r)
+dm_od = dm; print("dm_od =",dm)
+
+
+# In[52]:
+
+
+r_prev = r_oi;
 init_prev();
-for i in range(2,N):
+for i in range(N,1,-1):
+    print("i =",i)
     optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r)
+d_oi_od = d_min; print("d_oi_od =",d_min)
+r_oi_od = r; print("r_oi_od =",r)
+dm_oi_od = dm; print("dm_oi_od =",dm)
 
 
-# In[28]:
+# In[53]:
 
 
-ver(r)
+r_prev = r_od;
+init_prev();
+for i in range(2,N+1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r)
+d_od_oi = d_min; print("d_od_oi =",d_min)
+r_od_oi = r; print("r_od_oi =",r)
+dm_od_oi = dm; print("dm_od_oi =",dm)
 
 
-# In[6]:
+# In[41]:
 
 
 d_opt = 3986.1;
@@ -1881,11 +1925,11 @@ if d_nn_s3b_s2b_s3f < d_nn_s3b_s2b:
 
 # ### NN + s3b + s2b + s3b
 
-# In[288]:
+# In[320]:
 
 
 r = r_nn_s3b_s2b[:]; d_min=d_nn_s3b_s2b; dm_nn_s3b_s2b_s3b=[d_nn_s3b_s2b]; i_nn_s3b_s2b_s3b=[0]; j_nn_s3b_s2b_s3b=[0]; dc_nn_s3b_s2b_s3b=[0];
-while swap3first():
+while swap3best():
     dm_nn_s3b_s2b_s3b.append(d_min)
     i_nn_s3b_s2b_s3b.append(i_opt)
     j_nn_s3b_s2b_s3b.append(j_opt)
@@ -1904,7 +1948,7 @@ if d_nn_s3b_s2b_s3b < d_nn_s3b_s2b:
     plt.plot(dm_nn_s3b_s2b_s3b)
 
 
-# In[316]:
+# In[54]:
 
 
 r_nn = [0, 18, 14, 4, 8, 7, 12, 2, 5, 20, 13, 11, 16, 1, 3, 6, 19, 9, 17, 10, 21, 15, 0]
@@ -2310,8 +2354,25 @@ i_nn_s3b_s2b_s3b = [0]
 j_nn_s3b_s2b_s3b = [0]
 dc_nn_s3b_s2b_s3b = [0]
 
+# from optcities()
+d_oi = 3986.1
+r_oi = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+dm_oi = [12713.0, 11648.4, 11551.4, 10887.4, 10815.4, 10710.4, 10596.4, 10388.4, 10360.4, 10279.4, 9646.4, 9148.4, 9126.4, 8959.4, 8927.4, 8533.4, 8365.4, 8210.4, 8135.0, 8031.0, 7777.0, 7532.0, 7192.0, 7084.0, 6923.0, 6784.0, 6539.0, 6342.0, 6262.0, 5973.1, 5773.1, 5585.1, 5581.1, 5569.1, 5535.1, 5492.1, 5446.1, 5405.1, 5230.1, 5115.1, 5038.1, 4961.1, 4908.1, 4862.1, 4836.1, 4811.1, 4783.1, 4728.1, 4678.1, 4659.1, 4449.1, 4308.1, 4292.1, 4203.1, 4111.1, 3986.1]
 
-# In[318]:
+d_od = 4372.1
+r_od = [0, 6, 16, 13, 11, 1, 3, 17, 9, 10, 19, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+dm_od = [12713.0, 12674.0, 12586.0, 12572.0, 12276.0, 12058.0, 11839.0, 11596.0, 11249.0, 11222.0, 11211.0, 11022.0, 11019.0, 10758.0, 10745.0, 10156.0, 10130.0, 9796.0, 9743.0, 9651.0, 9211.0, 9113.0, 8809.0, 8459.0, 8270.0, 8111.0, 7954.0, 7056.0, 6966.0, 6748.0, 6710.0, 6431.0, 6358.0, 6321.0, 6135.0, 5998.6, 5900.6, 5779.6, 5674.0, 5542.0, 5427.0, 5307.0, 5245.0, 5158.0, 5130.0, 5104.0, 5061.0, 4862.0, 4711.0, 4653.0, 4650.0, 4643.0, 4637.1, 4506.1, 4411.1, 4372.1]
+
+d_oi_od = 3986.1
+r_oi_od = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+dm_oi_od = [3986.1]
+
+d_od_oi = 4372.1
+r_od_oi = [0, 6, 16, 13, 11, 1, 3, 17, 9, 10, 19, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+dm_od_oi = [4372.1]
+
+
+# In[55]:
 
 
 plt.figure(1, figsize=(16,16))
@@ -2320,8 +2381,14 @@ plt.plot(dm_s2f, color='blue', marker='x', linestyle='solid', linewidth=1, marke
 plt.plot(dm_s2b, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=3)
 plt.plot(dm_s3f, color='green', marker='x', linestyle='solid', linewidth=1, markersize=3)
 plt.plot(dm_s3b, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=3)
-plt.plot(np.array([d_nn]*(len(dm_s2f)+len(dm_s2f_s3f)+len(dm_s2f_s3f_s2f))), color='orange', linestyle='dashed', linewidth=1)
-plt.plot(np.array([d_minimal]*(len(dm_s2f)+len(dm_s2f_s3f)+len(dm_s2f_s3f_s2f))), color='red', linestyle='dotted', linewidth=2)
+plt.plot(np.array([d_nn]*(len(dm_oi))), color='orange', linestyle='dashed', linewidth=1)
+plt.plot(dm_oi, color='magenta', linestyle='dashdot', linewidth=2)
+plt.plot(dm_od, color='purple', linestyle='dashdot', linewidth=2)
+plt.plot(np.array([d_minimal]*(len(dm_oi))), color='red', linestyle='dotted', linewidth=2)
+if d_oi_od < d_oi:
+    plt.plot(dm_oi_od, color='purple', linestyle='dashdot', linewidth=2)
+if d_od_oi < d_od:
+    plt.plot(dm_od_oi, color='magenta', linestyle='dashdot', linewidth=2)
 if d_s2f_s3f < d_s2f:
     plt.plot(np.arange(len(dm_s2f)-1, len(dm_s2f)+len(dm_s2f_s3f)-1), dm_s2f_s3f, color='green', marker='x', linestyle='solid', linewidth=1, markersize=3)
     if d_s2f_s3f_s2f < d_s2f_s3f:
@@ -2430,14 +2497,14 @@ if d_nn_s3b < d_nn:
 
 plt.xlabel("swaps")
 plt.ylabel("distance")
-#y_min = d_minimal - d_minimal % 100; y_max = dm_s2f[0] - dm_s2f[0] % 100 + 100
-y_min = d_minimal-23; y_max = d_nn+100 # shorter paths
+y_min = d_minimal - d_minimal % 100; y_max = dm_s2f[0] - dm_s2f[0] % 100 + 100
+#y_min = d_minimal-23; y_max = d_nn+100 # shorter paths
 plt.ylim([y_min, y_max])
-plt.legend(["s2f", "s2b", "s3f", "s3b", "nn", "min"])
+plt.legend(["s2f", "s2b", "s3f", "s3b", "nn", "oi", "od", "min"])
 plt.show()
 
 
-# In[319]:
+# In[56]:
 
 
 d_best = {"nn":d_nn,
@@ -2497,6 +2564,7 @@ d_best = {"nn":d_nn,
           "nn_s3b_s2f_s3b":d_nn_s3b_s2f_s3b,
           "nn_s3b_s2b_s3f":d_nn_s3b_s2b_s3f,
           "nn_s3b_s2b_s3b":d_nn_s3b_s2b_s3b,
+          "d_oi":d_oi, "d_od":d_od, "d_oi_od":d_oi_od, "d_od_oi":d_od_oi,
           "optimal":d_opt,
           "minimal":d_minimal}
 d_best = sorted(d_best.items(), key=lambda x:x[1])
