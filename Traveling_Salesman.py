@@ -6,14 +6,14 @@
 
 # ## Input data
 
-# In[3]:
+# In[7]:
 
 
 import numpy as np # for fast arithmetics
 import matplotlib.pyplot as plt
 
 
-# In[4]:
+# In[8]:
 
 
 # City names alphabetically
@@ -28,7 +28,7 @@ print("Possible ways: ",math.factorial(N-1))
 print(cityNames)
 
 
-# In[5]:
+# In[9]:
 
 
 # Distance matrix using maps.google.com, by car.
@@ -89,13 +89,15 @@ t = np.array([
 # 4) Repeat Steps 2-3 for increasing number <i>n</i> of neighboring cities (3, 4, ..., <i>N</i>-1). Check only <i>n</i>-1 cyclic permutations.<br>
 # 5) All other rearrangements of <i>n</i> cities are addressed by rearranging from <i>n</i>-1 down to 2 cities, Steps 2-3.<br>
 
-# In[25]:
+# In[15]:
 
 
-def PR(): # print current result
+def PR():
+    """Print currently shortest distance - d, route (city numbers) - r."""
     global r,d_min
     print("d =",d_min,"; r =",r)
 def init():
+    """Initialize list of cities and distance: r, d_min."""
     global d_min,r,dm
     d_min=0 # current minimal distance
     r=[0] # r - current shortest route: a list of city numbers along the currently shortest route
@@ -107,6 +109,7 @@ def init():
     r.append(0) # The last item in the list is the same as the 1st element
     PR()
 def init_prev():
+    """Initialize list of cities from previous result r_prev, d_min."""
     global d_min,r,dm,r_prev
     d_min=0 # current minimal distance
     # r - current shortest route: a list of city numbers along the currently shortest route, Distance = 3986.1
@@ -120,6 +123,7 @@ def init_prev():
     PR()
 
 def optcities(n):
+    """Optimize the route by cyclic rearrangements of n adjacent cities."""
     #print("Rearrange ",n," cities:")
     global d_min,r,dm
     d_old = d_min+1 # keep track if distance has decreased
@@ -1948,7 +1952,299 @@ if d_nn_s3b_s2b_s3b < d_nn_s3b_s2b:
     plt.plot(dm_nn_s3b_s2b_s3b)
 
 
-# In[54]:
+# ### s2f + oi
+
+# In[19]:
+
+
+r = r_s2f; d_min = d_s2f; dm = [d_min]
+for i in range(2,N+1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), increasing n")
+    ver(r) # Verification of no repeated cities
+d_s2f_oi = d_min; print("d_s2f_oi =",d_min)
+r_s2f_oi = r; print("r_s2f_oi =",r)
+dm_s2f_oi = dm; print("dm_s2f_oi =",dm)
+
+
+# ### s2f + od
+
+# In[22]:
+
+
+r = r_s2f; d_min = d_s2f; dm = [d_min]
+for i in range(N,1,-1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r) # Verification of no repeated cities
+d_s2f_od = d_min; print("d_s2f_od =",d_min)
+r_s2f_od = r; print("r_s2f_od =",r)
+dm_s2f_od = dm; print("dm_s2f_od =",dm)
+
+
+# ### s2b + oi
+
+# In[24]:
+
+
+r = r_s2b; d_min = d_s2b; dm = [d_min]
+for i in range(2,N):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), increasing n")
+    ver(r) # Verification of no repeated cities
+d_s2b_oi = d_min; print("d_s2b_oi =",d_min)
+r_s2b_oi = r; print("r_s2b_oi =",r)
+dm_s2b_oi = dm; print("dm_s2b_oi =",dm)
+
+
+# ### s2b + od
+
+# In[26]:
+
+
+r = r_s2b; d_min = d_s2b; dm = [d_min]
+for i in range(N,1,-1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r) # Verification of no repeated cities
+d_s2b_od = d_min; print("d_s2b_od =",d_min)
+r_s2b_od = r; print("r_s2b_od =",r)
+dm_s2b_od = dm; print("dm_s2b_od =",dm)
+
+
+# ### s3f + oi
+
+# In[28]:
+
+
+r = r_s3f; d_min = d_s3f; dm = [d_min]
+for i in range(2,N):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), increasing n")
+    ver(r) # Verification of no repeated cities
+d_s3f_oi = d_min; print("d_s3f_oi =",d_min)
+r_s3f_oi = r; print("r_s3f_oi =",r)
+dm_s3f_oi = dm; print("dm_s3f_oi =",dm)
+
+
+# ### s3f + od
+
+# In[30]:
+
+
+r = r_s3f; d_min = d_s3f; dm = [d_min]
+for i in range(N,1,-1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r) # Verification of no repeated cities
+d_s3f_od = d_min; print("d_s3f_od =",d_min)
+r_s3f_od = r; print("r_s3f_od =",r)
+dm_s3f_od = dm; print("dm_s3f_od =",dm)
+
+
+# ### s3b + oi
+
+# In[32]:
+
+
+r = r_s3b; d_min = d_s3b; dm = [d_min]
+for i in range(2,N):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), increasing n")
+    ver(r) # Verification of no repeated cities
+d_s3b_oi = d_min; print("d_s3b_oi =",d_min)
+r_s3b_oi = r; print("r_s3b_oi =",r)
+dm_s3b_oi = dm; print("dm_s3b_oi =",dm)
+
+
+# ### s3b + od
+
+# In[34]:
+
+
+r = r_s3b; d_min = d_s3b; dm = [d_min]
+for i in range(N,1,-1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r) # Verification of no repeated cities
+d_s3b_od = d_min; print("d_s3b_od =",d_min)
+r_s3b_od = r; print("r_s3b_od =",r)
+dm_s3b_od = dm; print("dm_s3b_od =",dm)
+
+
+# ### mp
+
+# In[38]:
+
+
+d_mp = 3986.1
+r_mp = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+ver(r_mp)
+
+
+# ### mp + s2f
+
+# In[40]:
+
+
+r = r_mp[:]; d_min=d_mp; dm_mp_s2f=[d_mp]; i_mp_s2f=[0]; j_mp_s2f=[0]; dc_mp_s2f=[0];
+while swap2first():
+    dm_mp_s2f.append(d_min)
+    i_mp_s2f.append(i_opt)
+    j_mp_s2f.append(j_opt)
+    dc_mp_s2f.append(dc_min)
+d_mp_s2f = d_min
+r_mp_s2f = r
+print("dm_mp_s2f =",dm_mp_s2f)
+print("d_mp_s2f =",d_mp_s2f)
+print("r_mp_s2f =",r)
+print("i_mp_s2f =",i_mp_s2f)
+print("j_mp_s2f =",j_mp_s2f)
+print("dc_mp_s2f =",dc_mp_s2f)
+if d_mp_s2f < d_mp:
+    ver(r)
+    plt.figure(1, figsize=(10,10))
+    plt.plot(dm_mp_s2f)
+
+
+# ### mp + s2b
+
+# In[43]:
+
+
+r = r_mp[:]; d_min=d_mp; dm_mp_s2b=[d_mp]; i_mp_s2b=[0]; j_mp_s2b=[0]; dc_mp_s2b=[0];
+while swap2best():
+    dm_mp_s2b.append(d_min)
+    i_mp_s2b.append(i_opt)
+    j_mp_s2b.append(j_opt)
+    dc_mp_s2b.append(dc_min)
+d_mp_s2b = d_min
+r_mp_s2b = r
+print("dm_mp_s2b =",dm_mp_s2b)
+print("d_mp_s2b =",d_mp_s2b)
+print("r_mp_s2b =",r)
+print("i_mp_s2b =",i_mp_s2b)
+print("j_mp_s2b =",j_mp_s2b)
+print("dc_mp_s2b =",dc_mp_s2b)
+if d_mp_s2b < d_mp:
+    ver(r)
+    plt.figure(1, figsize=(10,10))
+    plt.plot(dm_mp_s2b)
+
+
+# ### mp + s3f
+
+# In[45]:
+
+
+r = r_mp[:]; d_min=d_mp; dm_mp_s3f=[d_mp]; i_mp_s3f=[0]; j_mp_s3f=[0]; dc_mp_s3f=[0];
+while swap3first():
+    dm_mp_s3f.append(d_min)
+    i_mp_s3f.append(i_opt)
+    j_mp_s3f.append(j_opt)
+    dc_mp_s3f.append(dc_min)
+d_mp_s3f = d_min
+r_mp_s3f = r
+print("dm_mp_s3f =",dm_mp_s3f)
+print("d_mp_s3f =",d_mp_s3f)
+print("r_mp_s3f =",r)
+print("i_mp_s3f =",i_mp_s3f)
+print("j_mp_s3f =",j_mp_s3f)
+print("dc_mp_s3f =",dc_mp_s3f)
+if d_mp_s3f < d_mp:
+    ver(r)
+    plt.figure(1, figsize=(10,10))
+    plt.plot(dm_mp_s3f)
+
+
+# ### mp + s3b
+
+# In[47]:
+
+
+r = r_mp[:]; d_min=d_mp; dm_mp_s3b=[d_mp]; i_mp_s3b=[0]; j_mp_s3b=[0]; dc_mp_s3b=[0];
+while swap3best():
+    dm_mp_s3b.append(d_min)
+    i_mp_s3b.append(i_opt)
+    j_mp_s3b.append(j_opt)
+    dc_mp_s3b.append(dc_min)
+d_mp_s3b = d_min
+r_mp_s3b = r
+print("dm_mp_s3b =",dm_mp_s3b)
+print("d_mp_s3b =",d_mp_s3b)
+print("r_mp_s3b =",r)
+print("i_mp_s3b =",i_mp_s3b)
+print("j_mp_s3b =",j_mp_s3b)
+print("dc_mp_s3b =",dc_mp_s3b)
+if d_mp_s3b < d_mp:
+    ver(r)
+    plt.figure(1, figsize=(10,10))
+    plt.plot(dm_mp_s3b)
+
+
+# ### mp + oi
+
+# In[49]:
+
+
+r = r_mp; d_min = d_mp; dm = [d_min]
+for i in range(2,N):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), increasing n")
+    ver(r) # Verification of no repeated cities
+d_mp_oi = d_min; print("d_mp_oi =",d_min)
+r_mp_oi = r; print("r_mp_oi =",r)
+dm_mp_oi = dm; print("dm_mp_oi =",dm)
+
+
+# ### mp + od
+
+# In[51]:
+
+
+r = r_mp; d_min = d_mp; dm = [d_min]
+for i in range(N,1,-1):
+    print("i =",i)
+    optcities(i);
+if len(dm)>1:
+    plt.plot(dm); plt.title("optcities(), decreasing n")
+    ver(r) # Verification of no repeated cities
+d_mp_od = d_min; print("d_mp_od =",d_min)
+r_mp_od = r; print("r_mp_od =",r)
+dm_mp_od = dm; print("dm_mp_od =",dm)
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[52]:
 
 
 r_nn = [0, 18, 14, 4, 8, 7, 12, 2, 5, 20, 13, 11, 16, 1, 3, 6, 19, 9, 17, 10, 21, 15, 0]
@@ -2371,8 +2667,83 @@ d_od_oi = 4372.1
 r_od_oi = [0, 6, 16, 13, 11, 1, 3, 17, 9, 10, 19, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
 dm_od_oi = [4372.1]
 
+d_s2f_oi = 4103.1
+r_s2f_oi = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 14, 21, 4, 15, 8, 18, 0]
+dm_s2f_oi = [6004.1, 5979.1, 5967.1, 5608.1, 5596.5, 5527.5, 5307.1, 5207.1, 5134.1, 5003.1, 4788.1, 4663.1, 4571.1, 4468.1, 4318.1, 4103.1]
 
-# In[55]:
+d_s2f_od = 4087.1000000000004
+r_s2f_od = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 0]
+dm_s2f_od = [6004.1, 5693.1, 5508.1, 5468.1, 5373.1, 5209.1, 4755.1, 4613.1, 4531.1, 4518.5, 4444.1, 4407.1, 4397.1, 4355.5, 4216.1, 4205.1, 4140.1, 4112.1, 4087.1000000000004]
+
+d_s2b_oi = 4047.1000000000004
+r_s2b_oi = [0, 10, 9, 17, 6, 19, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+dm_s2b_oi = [4577.1, 4511.1, 4472.1, 4450.1, 4421.1, 4232.1, 4198.1, 4181.1, 4075.1000000000004, 4047.1000000000004]
+
+d_s2b_od = 3986.1000000000004
+r_s2b_od = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+dm_s2b_od = [4577.1, 4557.1, 4354.1, 4337.1, 4271.1, 4165.1, 4014.1000000000004, 3986.1000000000004]
+
+d_s3f_oi = 3986.1000000000004
+r_s3f_oi = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+dm_s3f_oi = [4251.1, 4194.1, 4129.1, 4014.1000000000004, 3986.1000000000004]
+
+d_s3f_od = 3986.1000000000004
+r_s3f_od = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+dm_s3f_od = [4251.1, 4194.1, 4129.1, 4014.1000000000004, 3986.1000000000004]
+
+d_s3b_oi = 3986.1000000000004
+r_s3b_oi = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+dm_s3b_oi = [4735.1, 4719.1, 4712.1, 4706.1, 4667.1, 4577.1, 4522.1, 4307.1, 4183.0, 4179.1, 4137.1, 4120.1, 4014.1000000000004, 3986.1000000000004]
+
+d_s3b_od = 4368.1
+r_s3b_od = [0, 18, 8, 15, 4, 21, 14, 7, 12, 2, 5, 20, 19, 3, 1, 16, 13, 11, 6, 17, 9, 10, 0]
+dm_s3b_od = [4735.1, 4677.1, 4574.1, 4384.1, 4368.1]
+
+d_mp = 3986.1
+r_mp = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+
+dm_mp_s2f = [3986.1]
+d_mp_s2f = 3986.1
+r_mp_s2f = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+i_mp_s2f = [0]
+j_mp_s2f = [0]
+dc_mp_s2f = [0]
+
+dm_mp_s2b = [3986.1]
+d_mp_s2b = 3986.1
+r_mp_s2b = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+i_mp_s2b = [0]
+j_mp_s2b = [0]
+dc_mp_s2b = [0]
+
+dm_mp_s3f = [3986.1]
+d_mp_s3f = 3986.1
+r_mp_s3f = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+i_mp_s3f = [0]
+j_mp_s3f = [0]
+dc_mp_s3f = [0]
+
+dm_mp_s3b = [3986.1]
+d_mp_s3b = 3986.1
+r_mp_s3b = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+i_mp_s3b = [0]
+j_mp_s3b = [0]
+dc_mp_s3b = [0]
+
+d_mp_oi = 3986.1
+r_mp_oi = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+dm_mp_oi = [3986.1]
+
+d_mp_od = 3986.1
+r_mp_od = [0, 18, 14, 21, 4, 15, 8, 7, 12, 2, 5, 20, 13, 16, 11, 1, 3, 17, 9, 10, 6, 19, 0]
+dm_mp_od = [3986.1]
+
+d_opt = 3986.1;
+r_opt = [0, 19, 6, 10, 9, 17, 3, 1, 11, 16, 13, 20, 5, 2, 12, 7, 8, 15, 4, 21, 14, 18, 0]
+d_minimal = d_opt
+
+
+# In[53]:
 
 
 plt.figure(1, figsize=(16,16))
@@ -2381,10 +2752,11 @@ plt.plot(dm_s2f, color='blue', marker='x', linestyle='solid', linewidth=1, marke
 plt.plot(dm_s2b, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=3)
 plt.plot(dm_s3f, color='green', marker='x', linestyle='solid', linewidth=1, markersize=3)
 plt.plot(dm_s3b, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=3)
-plt.plot(np.array([d_nn]*(len(dm_oi))), color='orange', linestyle='dashed', linewidth=1)
+plt.plot(np.array([d_nn]*max(len(dm_oi),len(dm_od))), color='orange', linestyle='dashed', linewidth=1)
 plt.plot(dm_oi, color='magenta', linestyle='dashdot', linewidth=2)
 plt.plot(dm_od, color='purple', linestyle='dashdot', linewidth=2)
-plt.plot(np.array([d_minimal]*(len(dm_oi))), color='red', linestyle='dotted', linewidth=2)
+plt.plot(np.array([d_mp]*max(len(dm_oi),len(dm_od))), color='green', linestyle='dotted', linewidth=2)
+plt.plot(np.array([d_minimal]*max(len(dm_oi),len(dm_od))), color='red', linestyle='dotted', linewidth=2)
 if d_oi_od < d_oi:
     plt.plot(dm_oi_od, color='purple', linestyle='dashdot', linewidth=2)
 if d_od_oi < d_od:
@@ -2495,16 +2867,46 @@ if d_nn_s3b < d_nn:
         if d_nn_s3b_s2b_s3b < d_nn_s3b_s2b:
             plt.plot(np.arange(len(dm_nn_s3b)+len(dm_nn_s3b_s2b)-2, len(dm_nn_s3b)+len(dm_nn_s3b_s2b)+len(dm_nn_s3b_s2b_s3b)-2), dm_nn_s3b_s2b_s3b, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=3)
 
+if d_s2f_oi < d_s2f:
+    plt.plot(np.arange(len(dm_s2f)-1, len(dm_s2f)+len(dm_s2f_oi)-1), dm_s2f_oi, color='magenta', linestyle='dashdot', linewidth=2)
+if d_s2f_od < d_s2f:
+    plt.plot(np.arange(len(dm_s2f)-1, len(dm_s2f)+len(dm_s2f_od)-1), dm_s2f_od, color='purple', linestyle='dashdot', linewidth=2)
+if d_s2b_oi < d_s2b:
+    plt.plot(np.arange(len(dm_s2b)-1, len(dm_s2b)+len(dm_s2b_oi)-1), dm_s2b_oi, color='magenta', linestyle='dashdot', linewidth=2)
+if d_s2b_od < d_s2b:
+    plt.plot(np.arange(len(dm_s2b)-1, len(dm_s2b)+len(dm_s2b_od)-1), dm_s2b_od, color='purple', linestyle='dashdot', linewidth=2)
+if d_s3f_oi < d_s3f:
+    plt.plot(np.arange(len(dm_s3f)-1, len(dm_s3f)+len(dm_s3f_oi)-1), dm_s3f_oi, color='magenta', linestyle='dashdot', linewidth=2)
+if d_s3f_od < d_s3f:
+    plt.plot(np.arange(len(dm_s3f)-1, len(dm_s3f)+len(dm_s3f_od)-1), dm_s3f_od, color='purple', linestyle='dashdot', linewidth=2)
+if d_s3b_oi < d_s3b:
+    plt.plot(np.arange(len(dm_s3b)-1, len(dm_s3b)+len(dm_s3b_oi)-1), dm_s3b_oi, color='magenta', linestyle='dashdot', linewidth=2)
+if d_s3b_od < d_s3b:
+    plt.plot(np.arange(len(dm_s3b)-1, len(dm_s3b)+len(dm_s3b_od)-1), dm_s3b_od, color='purple', linestyle='dashdot', linewidth=2)
+
+if d_mp_s2f < d_mp:
+    plt.plot(dm_mp_s2f, color='blue', marker='x', linestyle='solid', linewidth=1, markersize=3)
+if d_mp_s2b < d_mp:
+    plt.plot(dm_mp_s2b, color='blue', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+if d_mp_s3f < d_mp:
+    plt.plot(dm_mp_s3f, color='green', marker='x', linestyle='solid', linewidth=1, markersize=3)
+if d_mp_s3b < d_mp:
+    plt.plot(dm_mp_s3b, color='green', marker='o', linestyle='dashed', linewidth=1, markersize=3)
+if d_mp_oi < d_mp:
+    plt.plot(dm_mp_oi, color='purple', linestyle='dashdot', linewidth=2)
+if d_mp_od < d_mp:
+    plt.plot(dm_mp_od, color='magenta', linestyle='dashdot', linewidth=2)
+
 plt.xlabel("swaps")
 plt.ylabel("distance")
-y_min = d_minimal - d_minimal % 100; y_max = dm_s2f[0] - dm_s2f[0] % 100 + 100
-#y_min = d_minimal-23; y_max = d_nn+100 # shorter paths
+#y_min = d_minimal - d_minimal % 100; y_max = dm_s2f[0] - dm_s2f[0] % 100 + 100
+y_min = d_minimal-23; y_max = d_nn+100 # shorter paths
 plt.ylim([y_min, y_max])
-plt.legend(["s2f", "s2b", "s3f", "s3b", "nn", "oi", "od", "min"])
+plt.legend(["s2f", "s2b", "s3f", "s3b", "nn", "oi", "od", "mp", "min"])
 plt.show()
 
 
-# In[56]:
+# In[54]:
 
 
 d_best = {"nn":d_nn,
@@ -2564,10 +2966,20 @@ d_best = {"nn":d_nn,
           "nn_s3b_s2f_s3b":d_nn_s3b_s2f_s3b,
           "nn_s3b_s2b_s3f":d_nn_s3b_s2b_s3f,
           "nn_s3b_s2b_s3b":d_nn_s3b_s2b_s3b,
-          "d_oi":d_oi, "d_od":d_od, "d_oi_od":d_oi_od, "d_od_oi":d_od_oi,
+          "oi":d_oi, "od":d_od, "oi_od":d_oi_od, "od_oi":d_od_oi,
+          "s2f_oi":d_s2f_oi, "s2f_od":d_s2f_od,"s2b_oi":d_s2b_oi,"s2b_od":d_s2b_od,
+          "s3f_oi":d_s3f_oi,"s3f_od":d_s3f_od,"s3b_oi":d_s3b_oi,"s3b_od":d_s3b_od,
+          "mp":d_mp, "mp_s2f":d_mp_s2f, "mp_s2b":d_mp_s2b, "mp_s3f":d_mp_s3f, "mp_s3b":d_mp_s3b,
+          "mp_oi":d_mp_oi, "mp_od":d_mp_od,
           "optimal":d_opt,
           "minimal":d_minimal}
 d_best = sorted(d_best.items(), key=lambda x:x[1])
 sortdict = dict(d_best)
 print(sortdict)
+
+
+# In[ ]:
+
+
+
 
